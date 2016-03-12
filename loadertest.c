@@ -10,6 +10,7 @@
 GLint callListIndex;
 
 void init(){
+	char fname[] = "fname";
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
 	GLfloat spec[] = {1.0,1.0,1.0};

@@ -1,21 +1,23 @@
 #ifndef EZLOADER_H_
 #define EZLOADER_H_
-
-typedef struct group_t{
-	char[64] name;
-	char[64] matName;
-	int numVertices;
-	double[3] * vertices;
-	double[3] * textureVertices; // ignore for now.
-	double[3] * normals;
-	int numElements;
-	element_t * elements;
-} grout_t;
+#include <GL/glut.h>
 
 typedef struct element_t{
 	char type;
-	int[3] vertexIndices;
+	int vertexIndices[3];
 } element_t;
+
+typedef struct group_t{
+	char name[64];
+	char matName[64];
+	int numVertices;
+	// Pointer to array of arrays of 3 doubles.
+	double * vertices;
+	double * textureVertices; // ignore for now.
+	double * normals;
+	int numElements;
+	element_t * elements;
+} group_t;
 
 // global declarations
 
