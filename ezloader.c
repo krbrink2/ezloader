@@ -9,6 +9,19 @@
 	Create a group_t struct, with name, material name, number of vertices, vertex array, texture vertex array, normal array, and number of elements, and element_t array.
 
 	Create element_t struct, with type, and vertex index array.
+
+	To parse:
+	Tokenize line.
+	If begins with g, start new group.
+	If begins with v, add vertex.
+	If begins with vt, ignore.
+	If begins with vn, add normal.
+	If begins with p/l/f, add element.
+
+	To load:
+	glBegin();
+	For each element, set normal and send it.
+	glEnd();
 */
 
 typedef struct group_t{
@@ -16,7 +29,7 @@ typedef struct group_t{
 	char[64] matName;
 	int numVertices;
 	double[3] * vertices;
-	double[3] * textureVertices;
+	double[3] * textureVertices; // ignore for now.
 	double[3] * normals;
 	int numElements;
 	element_t * elements;
