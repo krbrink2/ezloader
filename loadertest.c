@@ -10,7 +10,7 @@
 GLint callListIndex;
 
 void init(){
-	char fname[] = "fname";
+	char fname[] = "toyplane.obj";
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
 	GLfloat spec[] = {1.0,1.0,1.0};
@@ -37,7 +37,8 @@ void init(){
 	        printf("can't open file %s\n", fname);
 		  exit(1);
 	    }
-	    // LOAD HERE
+	// LOAD HERE
+	ezloadCallList(callListIndex, fp);
 	fclose(fp);
 }
 

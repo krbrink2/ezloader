@@ -1,6 +1,7 @@
 #ifndef EZLOADER_H_
 #define EZLOADER_H_
 #include <GL/glut.h>
+#include <stdio.h>
 
 typedef struct element_t{
 	char type;
