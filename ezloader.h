@@ -2,6 +2,7 @@
 #define EZLOADER_H_
 #include <GL/glut.h>
 #include <stdio.h>
+#define MAX_TOKEN_SIZE 64
 
 typedef struct element_t{
 	char type;
@@ -9,8 +10,8 @@ typedef struct element_t{
 } element_t;
 
 typedef struct group_t{
-	char name[64];
-	char matName[64];
+	char name[MAX_TOKEN_SIZE + 1];
+	char matName[MAX_TOKEN_SIZE + 1];
 	int numVertices;
 	// Pointer to array of arrays of 3 doubles.
 	double * vertices;

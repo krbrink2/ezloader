@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <GL/gl.h>
 #include <string.h>
-#define MAX_TOKEN_SIZE 64
 
 /* The plan:
 	This loader will only handle points, lines, and faces, and ignore the rest.
@@ -28,7 +27,7 @@
 
 int ezloadCallList(GLint callListIndex, FILE *fp){
 	//glPointSize(2.0);
-	group_t * group = NULL;
+	group_t * groupPtr = NULL;
 	glNewList(callListIndex, GL_COMPILE);
 	{
 		while(!feof(fp)){
@@ -61,25 +60,37 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			// String successfully tokenized
 			// No switch with strings, so if-else ladder
 			if(!strcmp(tokens[0], "g")){
-				printf("New group\n");
+				//printf("New group\n");
+				// If there's an old group_t, discard it.
+				if(NULL != grouptPtr){
+					free(groupPtr);
+					strcpy()
+				}
+				groupPtr = malloc(sizeof(group_t));
+				strcpy(groupPtr->name, tokens[1]);
+			}
+			else if (!strcmp(tokens[0], "usemtl")){
+				strcpy(groupPtr->matName, tokens[1]);
+				printf("%s\n", tokens[1]);
 			}
 			else if(!strcmp(tokens[0], "v")){
-				printf("New vertex\n");
+				//printf("New vertex\n");
+				// Add this vertex to groupPtr->vertices array.
 			}
 			else if(!strcmp(tokens[0], "vt")){
-				printf("New texture vertex\n");
+				//printf("New texture vertex\n");
 			}
 			else if(!strcmp(tokens[0], "vn")){
-				printf("New vertex normal\n");
+				//printf("New vertex normal\n");
 			}
 			else if(!strcmp(tokens[0], "p")){
-				printf("New plane\n");
+				//printf("New plane\n");
 			}
 			else if(!strcmp(tokens[0], "l")){
-				printf("New line\n");
+				//printf("New line\n");
 			}
 			else if(!strcmp(tokens[0], "f")){
-				printf("New face\n");
+				//printf("New face\n");
 			}
 
 
