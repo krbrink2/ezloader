@@ -27,9 +27,9 @@
 
 int ezloadCallList(GLint callListIndex, FILE *fp){
 	//glPointSize(2.0);
-	group_t * groupPtr = NULL;
 	glNewList(callListIndex, GL_COMPILE);
 	{
+		group_t * groupPtr = NULL;
 		while(!feof(fp)){
 			char * line = NULL;
 			size_t linelength = 0;
@@ -62,16 +62,16 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			if(!strcmp(tokens[0], "g")){
 				//printf("New group\n");
 				// If there's an old group_t, discard it.
-				if(NULL != grouptPtr){
+				if(NULL != groupPtr){
 					free(groupPtr);
-					strcpy()
 				}
-				groupPtr = malloc(sizeof(group_t));
+				printf("%lu\n", sizeof(group_t));
+				groupPtr = (group_t*)malloc(sizeof(group_t));
 				strcpy(groupPtr->name, tokens[1]);
 			}
+			//@TODO mtllib
 			else if (!strcmp(tokens[0], "usemtl")){
 				strcpy(groupPtr->matName, tokens[1]);
-				printf("%s\n", tokens[1]);
 			}
 			else if(!strcmp(tokens[0], "v")){
 				//printf("New vertex\n");
