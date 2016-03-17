@@ -32,12 +32,6 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 	glNewList(callListIndex, GL_COMPILE);
 	{
 		while(!feof(fp)){
-			/* Tokenize line.
-			If begins with g, start new group.
-			If begins with v, add vertex.
-			If begins with vt, ignore (for now).
-			If begins with vn, add normal.
-			If begins with p/l/f, add element. */
 			char * line = NULL;
 			size_t linelength = 0;
 			getline(&line, &linelength, fp);// Allocates
@@ -56,9 +50,37 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				strcpy(tokens[i++], temp);				
 				temp = strtok(NULL, " ");
 			}
-			printf("%s %s %s %s\n", tokens[0], tokens[1], tokens[2], tokens[3]);
+			//printf("%s %s %s %s\n", tokens[0], tokens[1], tokens[2], tokens[3]);
 			free(line);
+			/* Tokenize line.
+			If begins with g, start new group.
+			If begins with v, add vertex.
+			If begins with vt, ignore (for now).
+			If begins with vn, add normal.
+			If begins with p/l/f, add element. */
 			// String successfully tokenized
+			// No switch with strings, so if-else ladder
+			if(!strcmp(tokens[0], "g")){
+				printf("New group\n");
+			}
+			else if(!strcmp(tokens[0], "v")){
+				printf("New vertex\n");
+			}
+			else if(!strcmp(tokens[0], "vt")){
+				printf("New texture vertex\n");
+			}
+			else if(!strcmp(tokens[0], "vn")){
+				printf("New vertex normal\n");
+			}
+			else if(!strcmp(tokens[0], "p")){
+				printf("New plane\n");
+			}
+			else if(!strcmp(tokens[0], "l")){
+				printf("New line\n");
+			}
+			else if(!strcmp(tokens[0], "f")){
+				printf("New face\n");
+			}
 
 
 	 	 	//read=fscanf(fp,"%c %f %f %f",&ch,&x,&y,&z);
