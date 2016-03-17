@@ -59,7 +59,11 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			If begins with p/l/f, add element. */
 			// String successfully tokenized
 			// No switch with strings, so if-else ladder
-			if(!strcmp(tokens[0], "g")){
+			printf("%s\n", mtllibName);
+			if(!strcmp(tokens[0], "mtllib")){
+				strcpy(mtllibName, tokens[1]);
+			}
+			else if(!strcmp(tokens[0], "g")){
 				//printf("New group\n");
 				// If there's an old group_t, discard it.
 				if(NULL != groupPtr){

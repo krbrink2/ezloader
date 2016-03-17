@@ -22,6 +22,7 @@ typedef struct group_t{
 } group_t;
 
 // global declarations
+char mtllibName[MAX_TOKEN_SIZE + 1];
 
 // function declarations
 int ezloadCallList(GLint callListIndex, FILE *fp);
