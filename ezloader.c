@@ -58,8 +58,7 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			If begins with vn, add normal.
 			If begins with p/l/f, add element. */
 			// String successfully tokenized
-			// No switch with strings, so if-else ladder
-			printf("%s\n", mtllibName);
+			// No switch with strings supported, so if-else ladder
 			if(!strcmp(tokens[0], "mtllib")){
 				strcpy(mtllibName, tokens[1]);
 			}
@@ -67,13 +66,21 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				//printf("New group\n");
 				// If there's an old group_t, discard it.
 				if(NULL != groupPtr){
+					free(groupPtr->vertices);
+					free(groupPtr->textureVertices);
+					free(groupPtr->vertexNormals);
 					free(groupPtr);
+					groupPtr = NULL;
 				}
-				printf("%lu\n", sizeof(group_t));
+				// Allocate new group_t
 				groupPtr = (group_t*)malloc(sizeof(group_t));
 				strcpy(groupPtr->name, tokens[1]);
+				// Initialize group arrays
+				groupPtr->arraySize = 128;	// initial number
+				groupPtr->vertices = malloc(groupPtr->arraySize*3*sizeof(0.0));
+				groupPtr->textureVertices = malloc(groupPtr->arraySize*3*sizeof(0.0));
+				groupPtr->vertexNormals = malloc(groupPtr->arraySize*3*sizeof(0.0));
 			}
-			//@TODO mtllib
 			else if (!strcmp(tokens[0], "usemtl")){
 				strcpy(groupPtr->matName, tokens[1]);
 			}
@@ -111,6 +118,8 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 	  			glBegin(GL_TRIANGLE_FAN);
 	  		}*/
 		}
+		free(groupPtr);
+		groupPtr = NULL;
 	}
 	glEndList();
 }
