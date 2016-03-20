@@ -10,6 +10,12 @@
 GLint callListIndex;
 
 void init(){
+	int maj, min;
+	glGetIntegerv(GL_MAJOR_VERSION, &maj);
+	glGetIntegerv(GL_MINOR_VERSION, &min);
+	printf("%i, %i\n", maj, min);
+
+
 	char fname[] = "toyplane.obj";
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};

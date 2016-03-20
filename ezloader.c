@@ -30,6 +30,9 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 	glNewList(callListIndex, GL_COMPILE);
 	{
 		group_t * groupPtr = NULL;
+		int vertexIndex = 0;
+		int textureVertexIndex = 0;
+		int vertexNormalIndex = 0;
 		while(!feof(fp)){
 			char * line = NULL;
 			size_t linelength = 0;
@@ -42,7 +45,7 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			temp = strtok(line, " ");
 			while(temp != NULL){
 				// copy token into tokens array
-				if(strlen(temp) > MAX_TOKEN_SIZE){	// SEGFAULT
+				if(strlen(temp) > MAX_TOKEN_SIZE){
 					printf("Token too large!");
 					exit(1);
 				}
@@ -77,16 +80,27 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				strcpy(groupPtr->name, tokens[1]);
 				// Initialize group arrays
 				groupPtr->arraySize = 128;	// initial number
-				groupPtr->vertices = malloc(groupPtr->arraySize*3*sizeof(0.0));
-				groupPtr->textureVertices = malloc(groupPtr->arraySize*3*sizeof(0.0));
-				groupPtr->vertexNormals = malloc(groupPtr->arraySize*3*sizeof(0.0));
+				groupPtr->vertices = malloc(groupPtr->arraySize*3*sizeof(GLfloat	));
+				groupPtr->textureVertices = malloc(groupPtr->arraySize*3*sizeof(GLfloat));
+				groupPtr->vertexNormals = malloc(groupPtr->arraySize*3*sizeof(GLfloat));
+				vertexIndex = textureVertexIndex = vertexNormalIndex = 0;
 			}
 			else if (!strcmp(tokens[0], "usemtl")){
 				strcpy(groupPtr->matName, tokens[1]);
 			}
 			else if(!strcmp(tokens[0], "v")){
 				//printf("New vertex\n");
-				// Add this vertex to groupPtr->vertices array.
+				groupPtr->numVertices++;
+				// Realloc if needed
+				if(groupPtr->numVertices > 3*groupPtr->arraySize){
+					groupPtr->vertices = realloc(groupPtr->vertices, 2*groupPtr->arraySize*sizeof(GLfloat));
+					groupPtr->textureVertices = realloc(groupPtr->textureVertices, 2*groupPtr->arraySize*sizeof(GLfloat));
+					groupPtr->vertexNormals = realloc(groupPtr->vertexNormals, 2*groupPtr->arraySize*sizeof(GLfloat));
+					groupPtr->arraySize = 2*groupPtr->arraySize;
+				}
+				groupPtr->vertices[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
+				groupPtr->vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
+				groupPtr->vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
 			}
 			else if(!strcmp(tokens[0], "vt")){
 				//printf("New texture vertex\n");

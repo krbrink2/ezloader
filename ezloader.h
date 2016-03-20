@@ -12,16 +12,18 @@ typedef struct element_t{
 typedef struct group_t{
 	char name[MAX_TOKEN_SIZE + 1];
 	char matName[MAX_TOKEN_SIZE + 1];
-	int arraySize;		// number of {double, double, double} elements in the below
+	int numVertices;
+	int arraySize;	// number of GLfloats in the below
 	// Pointer to array of arrays of 3 doubles.
-	double * vertices;
-	double * textureVertices; // ignore for now.
-	double * vertexNormals;
+	GLfloat * vertices;
+	GLfloat * textureVertices; // ignore for now.
+	GLfloat * vertexNormals;
 	int numElements;
 	element_t * elements;
 } group_t;
 
 // global declarations
+// @TODO Is this how I should be handling globals?
 char mtllibName[MAX_TOKEN_SIZE + 1];
 
 // function declarations
