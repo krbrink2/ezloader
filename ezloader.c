@@ -118,6 +118,14 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				//printf("New face\n");
 			}
 
+			// test
+			if(groupPtr->numVertices == 10){
+				for(i = 0; i < 10; i++){
+					printf("%d\n", (double)groupPtr->vertices[i]);
+				}
+				exit(0);
+			}
+
 
 	 	 	//read=fscanf(fp,"%c %f %f %f",&ch,&x,&y,&z);
 			/*
