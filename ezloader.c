@@ -79,20 +79,21 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				groupPtr = (group_t*)malloc(sizeof(group_t));
 				strcpy(groupPtr->name, tokens[1]);
 				// Initialize group arrays
-				groupPtr->arraySize = 128;	// initial number
-				groupPtr->vertices = malloc(groupPtr->arraySize*3*sizeof(GLfloat	));
-				groupPtr->textureVertices = malloc(groupPtr->arraySize*3*sizeof(GLfloat));
-				groupPtr->vertexNormals = malloc(groupPtr->arraySize*3*sizeof(GLfloat));
+				groupPtr->arraySize = 256;	// initial number of GLfloats
+				groupPtr->vertices = malloc(groupPtr->arraySize*sizeof(GLfloat));
+				groupPtr->textureVertices = malloc(groupPtr->arraySize*sizeof(GLfloat));
+				groupPtr->vertexNormals = malloc(groupPtr->arraySize*sizeof(GLfloat));
+				groupPtr->numVertices = groupPtr->numElements = 0;
 				vertexIndex = textureVertexIndex = vertexNormalIndex = 0;
 			}
 			else if (!strcmp(tokens[0], "usemtl")){
 				strcpy(groupPtr->matName, tokens[1]);
 			}
 			else if(!strcmp(tokens[0], "v")){
-				//printf("New vertex\n");
+				printf("New vertex\n");
 				groupPtr->numVertices++;
 				// Realloc if needed
-				if(groupPtr->numVertices > 3*groupPtr->arraySize){
+				if(groupPtr->numVertices*3 > groupPtr->arraySize){
 					groupPtr->vertices = realloc(groupPtr->vertices, 2*groupPtr->arraySize*sizeof(GLfloat));
 					groupPtr->textureVertices = realloc(groupPtr->textureVertices, 2*groupPtr->arraySize*sizeof(GLfloat));
 					groupPtr->vertexNormals = realloc(groupPtr->vertexNormals, 2*groupPtr->arraySize*sizeof(GLfloat));
@@ -119,9 +120,12 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			}
 
 			// test
-			if(groupPtr->numVertices == 10){
+			if(groupPtr != NULL)
+				printf("%i\n", groupPtr->numVertices);
+			if(groupPtr != NULL && groupPtr->numVertices == 10){
 				for(i = 0; i < 10; i++){
-					printf("%d\n", (double)groupPtr->vertices[i]);
+					printf("!!!!");
+					printf("%f\n", (double)groupPtr->vertices[i]);
 				}
 				exit(0);
 			}
