@@ -105,18 +105,16 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			}
 			else if(!strcmp(tokens[0], "vt")){
 				//printf("New texture vertex\n");
-				/*
-				groupPtr->textureVertices[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
-				groupPtr->textureVertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
-				groupPtr->textureVertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);	*/
+				// Note: these are in pairs, not trios
+				//@TODO reconfigure reallocing to account for duos, not trios
+				groupPtr->textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
+				groupPtr->textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			}
 			else if(!strcmp(tokens[0], "vn")){
 				//printf("New vertex normal\n");
-				/*
-				groupPtr->vertexNormals[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
-				groupPtr->vertexNormals[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
-				groupPtr->vertexNormals[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
-				*/
+				groupPtr->vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[1], NULL);
+				groupPtr->vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[2], NULL);
+				groupPtr->vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[3], NULL);
 			}
 			else if(!strcmp(tokens[0], "p")){
 				//printf("New plane\n");
@@ -129,8 +127,8 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			}
 
 			// test
-			if(groupPtr != NULL && groupPtr->numVertices == 1){
-				//printf("%f, %f, %f\n", groupPtr->vertices[vertexIndex], groupPtr->textureVertices[textureVertexIndex], groupPtr->vertexNormals[vertexNormalIndex]);
+			if(groupPtr != NULL && vertexNormalIndex == 3){
+
 			}
 
 	 	 	//read=fscanf(fp,"%c %f %f %f",&ch,&x,&y,&z);
