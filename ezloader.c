@@ -90,7 +90,7 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				strcpy(groupPtr->matName, tokens[1]);
 			}
 			else if(!strcmp(tokens[0], "v")){
-				printf("New vertex\n");
+				//printf("New vertex\n");
 				groupPtr->numVertices++;
 				// Realloc if needed
 				if(groupPtr->numVertices*3 > groupPtr->arraySize){
@@ -105,9 +105,15 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			}
 			else if(!strcmp(tokens[0], "vt")){
 				//printf("New texture vertex\n");
+				groupPtr->textureVertices[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
+				groupPtr->textureVertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
+				groupPtr->textureVertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);	
 			}
 			else if(!strcmp(tokens[0], "vn")){
 				//printf("New vertex normal\n");
+				groupPtr->vertexNormals[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
+				groupPtr->vertexNormals[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
+				groupPtr->vertexNormals[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
 			}
 			else if(!strcmp(tokens[0], "p")){
 				//printf("New plane\n");
@@ -120,16 +126,9 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			}
 
 			// test
-			if(groupPtr != NULL)
-				printf("%i\n", groupPtr->numVertices);
-			if(groupPtr != NULL && groupPtr->numVertices == 10){
-				for(i = 0; i < 10; i++){
-					printf("!!!!");
-					printf("%f\n", (double)groupPtr->vertices[i]);
-				}
-				exit(0);
+			if(groupPtr != NULL && numVertices == 1){
+				printf("%f, %f, %f\n", groupPtr->vertices[vertexIndex], groupPtr->textureVertices[textureVertexIndex], groupPtr->vertexNormals[vertexNormalIndex]);
 			}
-
 
 	 	 	//read=fscanf(fp,"%c %f %f %f",&ch,&x,&y,&z);
 			/*
