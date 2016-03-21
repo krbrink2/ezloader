@@ -159,11 +159,11 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				//@TODO: can vertex/texture/normal even possibly be different?
 				// Build vertices 2D array.
 				// For tokens 1 thru numVertices...
-				for(i = 1; i <= numVertices; i++){
+				for(i = 0; i < numVertices; i++){
 					// Split in three
 					// strtoi, then into GLint
 					int a = 0;
-					temp = strtok(tokens[i], "/");
+					temp = strtok(tokens[i + 1], "/");
 					while(NULL != temp){
 						vertices[i][a++] = (GLint)strtol(temp, NULL, 0);
 						temp = strtok(NULL, "/");
@@ -191,7 +191,6 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 					printf("Unrecognized number of vertices!\n");
 					exit(1);
 				}
-				exit(0);
 			}
 
 			// test
