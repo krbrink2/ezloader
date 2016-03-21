@@ -33,14 +33,20 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 		int vertexIndex = 0;
 		int textureVertexIndex = 0;
 		int vertexNormalIndex = 0;
+		int elementsIndex = 0;
 		while(!feof(fp)){
 			char * line = NULL;
 			size_t linelength = 0;
 			getline(&line, &linelength, fp);// Allocates
+
 			// Tokenize string
 			char tokens[16][MAX_TOKEN_SIZE + 1]; // max 16 tokens of MAX_TOKEN_SIZE chars
+			int i;
+			for(i = 0; i < 16; i++){
+				tokens[i][0] = '\0';
+			}
+			i = 0;
 			char * temp;
-			int i = 0;
 			char str[MAX_TOKEN_SIZE + 1];
 			temp = strtok(line, " ");
 			while(temp != NULL){
@@ -54,13 +60,9 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			}
 			//printf("%s %s %s %s\n", tokens[0], tokens[1], tokens[2], tokens[3]);
 			free(line);
-			/* Tokenize line.
-			If begins with g, start new group.
-			If begins with v, add vertex.
-			If begins with vt, ignore (for now).
-			If begins with vn, add normal.
-			If begins with p/l/f, add element. */
 			// String successfully tokenized
+
+			// Populate arrays
 			// No switch with strings supported, so if-else ladder
 			if(!strcmp(tokens[0], "mtllib")){
 				strcpy(mtllibName, tokens[1]);
@@ -80,9 +82,11 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				strcpy(groupPtr->name, tokens[1]);
 				// Initialize group arrays
 				groupPtr->arraySize = 256;	// initial number of GLfloats
+				groupPtr->elementsArraySize = 256;
 				groupPtr->vertices = malloc(groupPtr->arraySize*sizeof(GLfloat));
 				groupPtr->textureVertices = malloc(groupPtr->arraySize*sizeof(GLfloat));
 				groupPtr->vertexNormals = malloc(groupPtr->arraySize*sizeof(GLfloat));
+				groupPtr->elements = malloc(groupPtr->elementsArraySize*sizeof(element_t));
 				groupPtr->numVertices = groupPtr->numElements = 0;
 				vertexIndex = textureVertexIndex = vertexNormalIndex = 0;
 			}
@@ -97,7 +101,7 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 					groupPtr->vertices = realloc(groupPtr->vertices, 2*groupPtr->arraySize*sizeof(GLfloat));
 					groupPtr->textureVertices = realloc(groupPtr->textureVertices, 2*groupPtr->arraySize*sizeof(GLfloat));
 					groupPtr->vertexNormals = realloc(groupPtr->vertexNormals, 2*groupPtr->arraySize*sizeof(GLfloat));
-					groupPtr->arraySize = 2*groupPtr->arraySize;
+					groupPtr->arraySize *= 2;
 				}
 				groupPtr->vertices[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
 				groupPtr->vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
@@ -118,6 +122,20 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			}
 			else if(!strcmp(tokens[0], "p")){
 				//printf("New plane\n");
+				groupPtr->numElements++;
+				// realloc if needed
+				if(groupPtr->numElements > groupPtr->elementsArraySize){
+					groupPtr->elements = realloc(groupPtr->elements, 2*groupPtr->elementsArraySize*sizeof(element_t));
+					groupPtr->elementsArraySize *= 2;
+				}
+				groupPtr->elements[elementsIndex].type = 'p';
+				if(tokens[4][0] == '\0'){
+					groupPtr->elements[elementsIndex].numVertices = 3;
+				}
+				else{
+					groupPtr->elements[elementsIndex].numVertices = 4;
+				}
+				// @RESUME tokenize vertex tokens
 			}
 			else if(!strcmp(tokens[0], "l")){
 				//printf("New line\n");

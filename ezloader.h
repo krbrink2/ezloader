@@ -6,7 +6,10 @@
 
 typedef struct element_t{
 	char type;
+	short numVertices;
 	int vertexIndices[3];
+	int textureVertexIndices[3];
+	int vertexNormalIdices[3];
 } element_t;
 
 typedef struct group_t{
@@ -19,6 +22,7 @@ typedef struct group_t{
 	GLfloat * textureVertices; // ignore for now.
 	GLfloat * vertexNormals;
 	int numElements;
+	int elementsArraySize;
 	element_t * elements;
 } group_t;
 
