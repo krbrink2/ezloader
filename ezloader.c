@@ -44,7 +44,7 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 		int textureVertexIndex = 0;
 		int vertexNormalIndex = 0;
 		int elementsIndex = 0;
-
+		int readyToDraw = 0;
 		while(!feof(fp)){
 			char * line = NULL;
 			size_t linelength = 0;
@@ -101,6 +101,7 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				groupPtr->elements = malloc(groupPtr->elementsArraySize*sizeof(element_t));
 				groupPtr->numVertices = groupPtr->numElements = 0;
 				vertexIndex = textureVertexIndex = vertexNormalIndex = 0;
+				readyToDraw = 0;
 			}
 			else if (!strcmp(tokens[0], "usemtl")){
 				strcpy(groupPtr->matName, tokens[1]);
@@ -136,6 +137,8 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 			}
 			else if(!strcmp(tokens[0], "p")){
 				//printf("New plane\n");
+
+				/*
 				groupPtr->numElements++;
 				// realloc if needed
 				if(groupPtr->numElements > groupPtr->elementsArraySize){
@@ -149,7 +152,25 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				else{
 					groupPtr->elements[elementsIndex].numVertices = 4;
 				}
+				*/
 				// @RESUME tokenize vertex tokens
+				if(!readyToDraw){
+					generateVertexArrays(groupPtr);
+				}
+				readyToDraw = 1;
+				int numVertices;
+				if(tokens[4][0]){
+					numVertices = 4;
+				}
+				else{
+					numVertices = 3;
+				}
+				// by vertex, then by vertex/texture/normal @TODO check order in .obj std
+				GLfloat vertices[4][3];
+				for(i = 0; i < numVertices; i++){
+					
+				}
+
 			}
 			else if(!strcmp(tokens[0], "l")){
 				//printf("New line\n");
