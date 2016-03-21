@@ -4,6 +4,7 @@
 #include <GL/gl.h>
 #include <string.h>
 
+//@TODO extend to 2 dimensions
 /* The plan:
 	This loader will only handle points, lines, and faces, and ignore the rest.
 
@@ -25,6 +26,15 @@
 	glEnd();
 */
 
+void generateVertexArrays(group_t * groupPtr){
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, groupPtr->vertices);
+	glNormalPointer(GL_FLOAT, 0, groupPtr->vertexNormals);
+	//glTexCoordPointer();
+}
+
 int ezloadCallList(GLint callListIndex, FILE *fp){
 	//glPointSize(2.0);
 	glNewList(callListIndex, GL_COMPILE);
@@ -34,6 +44,7 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 		int textureVertexIndex = 0;
 		int vertexNormalIndex = 0;
 		int elementsIndex = 0;
+
 		while(!feof(fp)){
 			char * line = NULL;
 			size_t linelength = 0;
@@ -84,7 +95,8 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				groupPtr->arraySize = 256;	// initial number of GLfloats
 				groupPtr->elementsArraySize = 256;
 				groupPtr->vertices = malloc(groupPtr->arraySize*sizeof(GLfloat));
-				groupPtr->textureVertices = malloc(groupPtr->arraySize*sizeof(GLfloat));
+				//groupPtr->textureVertices = malloc(groupPtr->arraySize*sizeof(GLfloat));
+				groupPtr->textureVertices = NULL;
 				groupPtr->vertexNormals = malloc(groupPtr->arraySize*sizeof(GLfloat));
 				groupPtr->elements = malloc(groupPtr->elementsArraySize*sizeof(element_t));
 				groupPtr->numVertices = groupPtr->numElements = 0;
@@ -99,7 +111,7 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				// Realloc if needed
 				if(groupPtr->numVertices*3 > groupPtr->arraySize){
 					groupPtr->vertices = realloc(groupPtr->vertices, 2*groupPtr->arraySize*sizeof(GLfloat));
-					groupPtr->textureVertices = realloc(groupPtr->textureVertices, 2*groupPtr->arraySize*sizeof(GLfloat));
+					//groupPtr->textureVertices = realloc(groupPtr->textureVertices, 2*groupPtr->arraySize*sizeof(GLfloat));
 					groupPtr->vertexNormals = realloc(groupPtr->vertexNormals, 2*groupPtr->arraySize*sizeof(GLfloat));
 					groupPtr->arraySize *= 2;
 				}
@@ -111,8 +123,10 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				//printf("New texture vertex\n");
 				// Note: these are in pairs, not trios
 				//@TODO reconfigure reallocing to account for duos, not trios
+				//@TODO allow this to dynamicallly reallocate here. Not tied to vertices.
+				/*
 				groupPtr->textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
-				groupPtr->textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
+				groupPtr->textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[2], NULL);*/
 			}
 			else if(!strcmp(tokens[0], "vn")){
 				//printf("New vertex normal\n");
