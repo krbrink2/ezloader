@@ -136,24 +136,13 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 				groupPtr->vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[3], NULL);
 			}
 			else if(!strcmp(tokens[0], "p")){
-				//printf("New plane\n");
-
-				/*
-				groupPtr->numElements++;
-				// realloc if needed
-				if(groupPtr->numElements > groupPtr->elementsArraySize){
-					groupPtr->elements = realloc(groupPtr->elements, 2*groupPtr->elementsArraySize*sizeof(element_t));
-					groupPtr->elementsArraySize *= 2;
-				}
-				groupPtr->elements[elementsIndex].type = 'p';
-				if(tokens[4][0] == '\0'){
-					groupPtr->elements[elementsIndex].numVertices = 3;
-				}
-				else{
-					groupPtr->elements[elementsIndex].numVertices = 4;
-				}
-				*/
-				// @RESUME tokenize vertex tokens
+				printf("Skipping point\n");
+			}
+			else if(!strcmp(tokens[0], "l")){
+				printf("Skipping line\n");
+			}
+			else if(!strcmp(tokens[0], "f")){
+				//printf("New face\n");
 				if(!readyToDraw){
 					generateVertexArrays(groupPtr);
 				}
@@ -166,17 +155,43 @@ int ezloadCallList(GLint callListIndex, FILE *fp){
 					numVertices = 3;
 				}
 				// by vertex, then by vertex/texture/normal @TODO check order in .obj std
-				GLfloat vertices[4][3];
-				for(i = 0; i < numVertices; i++){
-					
+				GLint vertices[4][3];
+				//@TODO: can vertex/texture/normal even possibly be different?
+				// Build vertices 2D array.
+				// For tokens 1 thru numVertices...
+				for(i = 1; i <= numVertices; i++){
+					// Split in three
+					// strtoi, then into GLint
+					int a = 0;
+					temp = strtok(tokens[i], "/");
+					while(NULL != temp){
+						vertices[i][a++] = (GLint)strtol(temp, NULL, 0);
+						temp = strtok(NULL, "/");
+					}
 				}
-
-			}
-			else if(!strcmp(tokens[0], "l")){
-				//printf("New line\n");
-			}
-			else if(!strcmp(tokens[0], "f")){
-				//printf("New face\n");
+				// Draw
+				if(numVertices == 3){
+					glBegin(GL_TRIANGLES);
+						glArrayElement(vertices[0][0]);
+						glArrayElement(vertices[1][0]);
+						glArrayElement(vertices[2][0]);
+					glEnd();
+					printf("Drew triangle: %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0]);
+				}
+				else if(numVertices == 4){
+					glBegin(GL_QUADS);
+						glArrayElement(vertices[0][0]);
+						glArrayElement(vertices[1][0]);
+						glArrayElement(vertices[2][0]);
+						glArrayElement(vertices[3][0]);
+					glEnd();
+					printf("Drew quad: %i, %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0]);
+				}
+				else{
+					printf("Unrecognized number of vertices!\n");
+					exit(1);
+				}
+				exit(0);
 			}
 
 			// test
