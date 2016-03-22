@@ -8,6 +8,7 @@
 
 // Globals
 GLint callListIndex;
+GLfloat angle;
 
 void init(){
 	int maj, min;
@@ -47,10 +48,35 @@ void init(){
 	ezloadCallList(callListIndex, fp);
 	//ezload(fp);
 	fclose(fp);
+
+	angle = 0;
 }
 
 void display(){
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity();
+	GLfloat lpos[] = {3.0, 3.0, 3.0};
+	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
+	gluLookAt(2, .5, 0, 0, 0, 0, 0, 1, 0);
 
+	glRotatef(angle, 0, 1, 0);
+	glScalef(.1, .1, .1);
+	glTranslatef(0, 0, -10);
+	GLfloat amb[] = {.4, .2, .1, 1.0};
+	GLfloat diff[] = {.83, .36, .1, 1.0};
+	GLfloat spec[] = {.9, .9, .9, 1.0};
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 10.0);
+	glCallList(callListIndex);
+
+
+	glutSwapBuffers();
+	glFlush();
+	glutPostRedisplay();
+
+	angle += 1.;
 }
 
 void reshape(int w, int h){
@@ -65,6 +91,9 @@ void reshape(int w, int h){
 void keyboard(unsigned char key, int x, int y){
 	switch (key){
 		case 'a':
+			break;
+		case 27:
+			exit(0);
 			break;
 	}
 }

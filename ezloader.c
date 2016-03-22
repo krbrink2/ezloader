@@ -36,9 +36,6 @@
 
 // Possibly rename? too similar to gl function
 void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat * vertexNormals){
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, vertices);
 	glNormalPointer(GL_FLOAT, 0, vertexNormals);
 	//glTexCoordPointer();
@@ -48,6 +45,9 @@ void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat
 */
 int ezload(FILE * fp){
 	// glPointSize(...)?
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
 	char groupName[MAX_TOKEN_SIZE + 1];
 	char mtllibName[MAX_TOKEN_SIZE + 1];
 	char matName[MAX_TOKEN_SIZE + 1];
@@ -173,7 +173,7 @@ int ezload(FILE * fp){
 					glArrayElement(vertices[1][0]);
 					glArrayElement(vertices[2][0]);
 				glEnd();
-				printf("Drew triangle: %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0]);
+				//printf("Drew triangle: %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0]);
 			}
 			else if(numIndices == 4){
 				glBegin(GL_QUADS);
@@ -182,17 +182,17 @@ int ezload(FILE * fp){
 					glArrayElement(vertices[2][0]);
 					glArrayElement(vertices[3][0]);
 				glEnd();
-				printf("Drew quad: %i, %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0]);
+				//printf("Drew quad: %i, %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0]);
 			}
 			else{
 				printf("Unrecognized number of vertices!\n");
 				exit(1);
 			}
 		}
-
 	}
-
-
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	// texcoords, too
 }
 
 int ezloadCallList(GLint callListIndex, FILE *fp){
