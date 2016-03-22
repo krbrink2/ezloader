@@ -45,6 +45,7 @@ void init(){
 	    }
 	// LOAD HERE
 	ezloadCallList(callListIndex, fp);
+	//ezload(fp);
 	fclose(fp);
 }
 

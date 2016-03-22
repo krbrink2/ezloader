@@ -26,8 +26,6 @@ typedef struct group_t{
 } group_t;
 
 // global declarations
-// @TODO Is this how I should be handling globals?
-char mtllibName[MAX_TOKEN_SIZE + 1];
 
 // function declarations
 int ezload(FILE *fp);
