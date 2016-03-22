@@ -17,7 +17,6 @@ typedef struct group_t{
 	char matName[MAX_TOKEN_SIZE + 1];
 	int numVertices;
 	int arraySize;	// number of GLfloats in the below
-	// Pointer to array of arrays of 3 doubles.
 	GLfloat * vertices;
 	GLfloat * textureVertices; // ignore for now.
 	GLfloat * vertexNormals;

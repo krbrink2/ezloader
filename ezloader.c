@@ -4,7 +4,12 @@
 #include <GL/gl.h>
 #include <string.h>
 
-//@TODO extend to 2 dimensions
+/* Considerations:
+	Extend to two diminsions later?
+	Process-and-discard information, or store for user to alter?
+		For now, process-and-discard. Get simple version running.
+	*/
+
 /* The plan:
 	This loader will only handle points, lines, and faces, and ignore the rest.
 
