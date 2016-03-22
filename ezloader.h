@@ -30,6 +30,7 @@ typedef struct group_t{
 char mtllibName[MAX_TOKEN_SIZE + 1];
 
 // function declarations
+int ezload(FILE *fp);
 int ezloadCallList(GLint callListIndex, FILE *fp);
 int parse(FILE *fp);
 int drawGroupCallList(group_t * group, GLint callListIndex);
