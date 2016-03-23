@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <GL/gl.h>
 #include <string.h>
+#include <assert.h>
 #define INITIAL_ARRAY_SIZE (512)
 
 /* Considerations:
@@ -111,6 +112,7 @@ int ezload(FILE * fp){
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
+			arraysAreDirty = 1;
 		}
 		else if(!strcmp(tokens[0], "vt")){
 			//printf("New texture vertex\n");
@@ -126,6 +128,7 @@ int ezload(FILE * fp){
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[1], NULL);
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[3], NULL);
+			arraysAreDirty  = 1;
 		}
 		else if(!strcmp(tokens[0], "p")){
 			printf("Skipping point\n");
@@ -162,12 +165,15 @@ int ezload(FILE * fp){
 					if(temp[0] == '\0'){
 						// Not using texture vertices here
 					}
-					vertices[i][a++] = (GLint)strtol(temp, NULL, 0);
+					vertices[i][a++] = (GLint)strtol(temp, NULL, 0) - 1;
 					temp = strtok(NULL, "/");
 				}
 			}
 			// Draw
 			if(numIndices == 3){
+				assert(vertices[0][0] < numVertices);
+				assert(vertices[1][0] < numVertices);
+				assert(vertices[2][0] < numVertices);
 				glBegin(GL_TRIANGLES);
 					glArrayElement(vertices[0][0]);
 					glArrayElement(vertices[1][0]);
@@ -176,6 +182,10 @@ int ezload(FILE * fp){
 				//printf("Drew triangle: %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0]);
 			}
 			else if(numIndices == 4){
+				assert(vertices[0][0] < numVertices);
+				assert(vertices[1][0] < numVertices);
+				assert(vertices[2][0] < numVertices);
+				assert(vertices[3][0] < numVertices);
 				glBegin(GL_QUADS);
 					glArrayElement(vertices[0][0]);
 					glArrayElement(vertices[1][0]);
