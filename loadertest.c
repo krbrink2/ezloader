@@ -16,18 +16,27 @@ void init(){
 	glGetIntegerv(GL_MINOR_VERSION, &min);
 	//printf("%i, %i\n", maj, min);
 
-
-	char fname[] = "toyplane.obj";
+	glShadeModel(GL_SMOOTH);
+	GLfloat matamb[] = {.83, .36, .1, 1.0};
+	GLfloat matdiff[] = {.083, .036, .01, 1.00};
+	GLfloat matspec[] = {.1, .1, .000001, 1.0};
+	glMaterialfv(GL_FRONT, GL_AMBIENT, matamb);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, matdiff);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, matspec);
+	glMaterialf(GL_FRONT, GL_SHININESS, 120);
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
-	GLfloat spec[] = {1.0,1.0,1.0};
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
+	GLfloat spec[] = {0*.01,0*.00001,1};
+	GLfloat lpos[] = {10.0, 1, 0};
+	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
+	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	char fname[] = "toyplane.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -55,20 +64,11 @@ void init(){
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	GLfloat lpos[] = {3.0, 3.0, 3.0};
-	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 	gluLookAt(3, 1, 0, 0, 0, 0, 0, 1, 0);
 
 	glRotatef(angle, 0, 1, 0);
 	glScalef(.1, .1, .1);
 	//glTranslatef(0, 0, -10);
-	GLfloat amb[] = {.4, .2, .1, 1.0};
-	GLfloat diff[] = {.083, .036, .01, 1.00};
-	GLfloat spec[] = {.0, .01, .001, 1.0};
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, amb);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diff);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, spec);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 1.0);
 	glCallList(callListIndex);
 
 
@@ -76,7 +76,7 @@ void display(){
 	glFlush();
 	glutPostRedisplay();
 
-	angle += 1.;
+	angle += .5;
 }
 
 void reshape(int w, int h){
