@@ -16,18 +16,20 @@ void init(){
 	glGetIntegerv(GL_MINOR_VERSION, &min);
 	//printf("%i, %i\n", maj, min);
 
+	glEnable(GL_NORMALIZE);
+
 	glShadeModel(GL_SMOOTH);
 	GLfloat matamb[] = {.83, .36, .1, 1.0};
-	GLfloat matdiff[] = {.083, .036, .01, 1.00};
-	GLfloat matspec[] = {.1, .1, .000001, 1.0};
+	GLfloat matdiff[] = {.83, .36, .1, 1.0};
+	GLfloat matspec[] = {1, 1, 1, 1.0};
 	glMaterialfv(GL_FRONT, GL_AMBIENT, matamb);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, matdiff);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, matspec);
-	glMaterialf(GL_FRONT, GL_SHININESS, 120);
+	glMaterialf(GL_FRONT, GL_SHININESS, 50);
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
-	GLfloat spec[] = {0*.01,0*.00001,1};
-	GLfloat lpos[] = {10.0, 1, 0};
+	GLfloat spec[] = {0,1,1};
+	GLfloat lpos[] = {3, 3, -3};
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
