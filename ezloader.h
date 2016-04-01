@@ -2,7 +2,7 @@
 #define EZLOADER_H_
 #include <GL/glut.h>
 #include <stdio.h>
-#define MAX_TOKEN_SIZE 64
+#define MAX_TOKEN_SIZE 128
 
 typedef struct element_t{
 	char type;

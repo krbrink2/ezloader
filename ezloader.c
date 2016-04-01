@@ -38,7 +38,7 @@
 // Possibly rename? too similar to gl function
 void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat * vertexNormals){
 	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glNormalPointer(GL_FLOAT, 0, vertexNormals);
+	//glNormalPointer(GL_FLOAT, 0, vertexNormals);
 	//glTexCoordPointer();
 }
 
@@ -47,7 +47,7 @@ void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat
 int ezload(FILE * fp){
 	// glPointSize(...)?
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
+	//glEnableClientState(GL_NORMAL_ARRAY);
 	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
 	char groupName[MAX_TOKEN_SIZE + 1];
 	char mtllibName[MAX_TOKEN_SIZE + 1];
@@ -66,9 +66,10 @@ int ezload(FILE * fp){
 		char * line = NULL;
 		size_t linelength = 0;
 		getline(&line, &linelength, fp);// Allocates
-		char tokens[16][MAX_TOKEN_SIZE + 1]; // max 16 tokens of MAX_TOKEN_SIZE chars
+		char tokens[32][MAX_TOKEN_SIZE + 1]; // max 16 tokens of MAX_TOKEN_SIZE chars
 		int i;
 		for(i = 0; i < 16; i++){
+			// Nullify each token
 			tokens[i][0] = '\0';
 		}
 		i = 0;
@@ -78,7 +79,7 @@ int ezload(FILE * fp){
 		while(temp != NULL){
 			// copy token into tokens array
 			if(strlen(temp) > MAX_TOKEN_SIZE){
-				printf("Token too large!");
+				printf("Token too large!\n");
 				exit(1);
 			}
 			strcpy(tokens[i++], temp);				

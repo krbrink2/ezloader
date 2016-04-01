@@ -16,9 +16,9 @@ void init(){
 	glGetIntegerv(GL_MINOR_VERSION, &min);
 	//printf("%i, %i\n", maj, min);
 
-	glEnable(GL_NORMALIZE);
+	//glEnable(GL_NORMALIZE);
 
-	glShadeModel(GL_SMOOTH);
+	//glShadeModel(GL_SMOOTH);
 	GLfloat matamb[] = {.83, .36, .1, 1.0};
 	GLfloat matdiff[] = {.83, .36, .1, 1.0};
 	GLfloat matspec[] = {1, 1, 1, 1.0};
@@ -38,7 +38,9 @@ void init(){
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
-	char fname[] = "toyplane.obj";
+	//char fname[] = "toyplane.obj";
+	//char fname[] = "Avent.obj";
+	char fname[] = "teapot_0.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -69,7 +71,7 @@ void display(){
 	gluLookAt(3, 1, 0, 0, 0, 0, 0, 1, 0);
 
 	glRotatef(angle, 0, 1, 0);
-	glScalef(.1, .1, .1);
+	glScalef(.01, .01, .01);
 	//glTranslatef(0, 0, -10);
 	glCallList(callListIndex);
 
