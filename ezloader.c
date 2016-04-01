@@ -38,7 +38,7 @@
 // Possibly rename? too similar to gl function
 void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat * vertexNormals){
 	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	//glNormalPointer(GL_FLOAT, 0, vertexNormals);
+	glNormalPointer(GL_FLOAT, 0, vertexNormals);
 	//glTexCoordPointer();
 }
 
@@ -47,7 +47,7 @@ void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat
 int ezload(FILE * fp){
 	// glPointSize(...)?
 	glEnableClientState(GL_VERTEX_ARRAY);
-	//glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
 	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
 	char groupName[MAX_TOKEN_SIZE + 1];
 	char mtllibName[MAX_TOKEN_SIZE + 1];
@@ -114,6 +114,10 @@ int ezload(FILE * fp){
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
 			arraysAreDirty = 1;
+			// Hack: set norms
+			//vertexNormals[vertexNormalIndex++] = 1;
+			//vertexNormals[vertexNormalIndex++] = 1;
+			//vertexNormals[vertexNormalIndex++] = 1;
 		}
 		else if(!strcmp(tokens[0], "vt")){
 			//printf("New texture vertex\n");
@@ -151,7 +155,7 @@ int ezload(FILE * fp){
 				numIndices = 3;
 			}
 			// by index, then by vertex/texture/normal
-			GLint vertices[4][3];
+			GLint indices[4][3];
 			//@TODO: can vertex/texture/normal even possibly be different with glarrays?
 			// Build vertices 2D array.
 			// For tokens 1 thru numVertices...
@@ -166,32 +170,33 @@ int ezload(FILE * fp){
 					if(temp[0] == '\0'){
 						// Not using texture vertices here
 					}
-					vertices[i][a++] = (GLint)strtol(temp, NULL, 0) - 1;
+					indices[i][a++] = (GLint)strtol(temp, NULL, 0) - 1;
 					temp = strtok(NULL, "/");
 				}
 			}
 			// Draw
 			if(numIndices == 3){
-				assert(vertices[0][0] < numVertices);
-				assert(vertices[1][0] < numVertices);
-				assert(vertices[2][0] < numVertices);
+				assert(indices[0][0] < numVertices);
+				assert(indices[1][0] < numVertices);
+				assert(indices[2][0] < numVertices);
+				printf("Drawing norms %f..., %f..., %f...\n", vertices[indices[0][0]*3], vertices[indices[1][0]*3], vertices[indices[2][0]*3]);
 				glBegin(GL_TRIANGLES);
-					glArrayElement(vertices[0][0]);
-					glArrayElement(vertices[1][0]);
-					glArrayElement(vertices[2][0]);
+					glArrayElement(indices[0][0]);
+					glArrayElement(indices[1][0]);
+					glArrayElement(indices[2][0]);
 				glEnd();
 				//printf("Drew triangle: %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0]);
 			}
 			else if(numIndices == 4){
-				assert(vertices[0][0] < numVertices);
-				assert(vertices[1][0] < numVertices);
-				assert(vertices[2][0] < numVertices);
-				assert(vertices[3][0] < numVertices);
+				assert(indices[0][0] < numVertices);
+				assert(indices[1][0] < numVertices);
+				assert(indices[2][0] < numVertices);
+				assert(indices[3][0] < numVertices);
 				glBegin(GL_QUADS);
-					glArrayElement(vertices[0][0]);
-					glArrayElement(vertices[1][0]);
-					glArrayElement(vertices[2][0]);
-					glArrayElement(vertices[3][0]);
+					glArrayElement(indices[0][0]);
+					glArrayElement(indices[1][0]);
+					glArrayElement(indices[2][0]);
+					glArrayElement(indices[3][0]);
 				glEnd();
 				//printf("Drew quad: %i, %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0]);
 			}

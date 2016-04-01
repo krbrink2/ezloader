@@ -16,9 +16,9 @@ void init(){
 	glGetIntegerv(GL_MINOR_VERSION, &min);
 	//printf("%i, %i\n", maj, min);
 
-	//glEnable(GL_NORMALIZE);
+	glEnable(GL_NORMALIZE);
 
-	//glShadeModel(GL_SMOOTH);
+	glShadeModel(GL_SMOOTH);
 	GLfloat matamb[] = {.83, .36, .1, 1.0};
 	GLfloat matdiff[] = {.83, .36, .1, 1.0};
 	GLfloat matspec[] = {1, 1, 1, 1.0};
@@ -70,9 +70,10 @@ void display(){
 	glLoadIdentity();
 	gluLookAt(3, 1, 0, 0, 0, 0, 0, 1, 0);
 
+	glTranslatef(-1, -2, 0);
 	glRotatef(angle, 0, 1, 0);
-	glScalef(.01, .01, .01);
-	//glTranslatef(0, 0, -10);
+	//glScalef(.01, .01, .01);
+	glTranslatef(0, 0, 0);
 	glCallList(callListIndex);
 
 
