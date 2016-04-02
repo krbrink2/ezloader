@@ -38,6 +38,15 @@ void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat
 // Draws all faces in 
 void flushFaces(){
 	//@TODO
+	/* Plan:
+	Each vertex has a set of assocNormals.
+	Every time a vertex is made, sets its assocNormals to zero vectors.
+	Upon flushFaces():
+	For each outstanding face, find face normal. For each vertex on this face, add this normal to the next non-zero assocNormal.
+	For each vertex, sum & normalize its assocNorms, put into vertexNormals.
+	Then generateVertexArrays(...).
+	Then, for each face, draw it.
+	*/
 	;
 }
 
