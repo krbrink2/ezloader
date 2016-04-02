@@ -7,9 +7,9 @@
 typedef struct element_t{
 	char type;
 	short numVertices;
-	int vertexIndices[3];
-	int textureVertexIndices[3];
-	int vertexNormalIdices[3];
+	int vertexIndices[4];
+	int textureVertexIndices[4];
+	int vertexNormalIndices[4];
 } element_t;
 
 typedef struct group_t{
@@ -30,7 +30,5 @@ typedef struct group_t{
 // function declarations
 int ezload(FILE *fp);
 int ezloadCallList(GLint callListIndex, FILE *fp);
-int parse(FILE *fp);
-int drawGroupCallList(group_t * group, GLint callListIndex);
 
 #endif // EZLOADER_H_

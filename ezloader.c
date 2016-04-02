@@ -19,7 +19,9 @@
 	GLfloat * textureVertices;
 	GLfloat * vertexNormals;
 	GLfloat * assocNormals; // numVertices quartets of trios of GLfloats
+	element_t * elements;
 	int arraySize, numVertices;
+	int elementArraySize, numElements;
 	char groupName[MAX_TOKEN_SIZE + 1];
 	char mtllibName[MAX_TOKEN_SIZE + 1];
 	char matName[MAX_TOKEN_SIZE + 1];
@@ -33,6 +35,12 @@ void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat
 	//glTexCoordPointer();
 }
 
+// Draws all faces in 
+void flushFaces(){
+	//@TODO
+	;
+}
+
 /* Returns 0 on success.
 */
 int ezload(FILE * fp){
@@ -41,14 +49,16 @@ int ezload(FILE * fp){
 	glEnableClientState(GL_NORMAL_ARRAY);
 	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
 	numVertices = 0;
-	arraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats in the below
+	arraySize = elementArraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats in the below
 	vertices = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
 	textureVertices = NULL;//malloc(INITIAL_ARRAY_SIZE*sizeof(GLfloat));
 	vertexNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
+	elements = malloc(INITIAL_ARRAY_SIZE * sizeof(element_t));
 	arraysAreDirty = 1;	// That is, need to generateArrays
 	vertexIndex = 0;
 	textureVertexIndex = 0;
 	vertexNormalIndex = 0;
+	numElements = 0;
 	while(!feof(fp)){
 		// Tokenize
 		char * line = NULL;
@@ -145,7 +155,7 @@ int ezload(FILE * fp){
 			// by index, then by vertex/texture/normal
 			GLint indices[4][3];
 			//@TODO: can vertex/texture/normal even possibly be different with glarrays?
-			// Build vertices 2D array.
+			// Build indices 2D array.
 			// For tokens 1 thru numVertices...
 			for(i = 0; i < numIndices; i++){
 				// Split in three
@@ -162,7 +172,36 @@ int ezload(FILE * fp){
 					temp = strtok(NULL, "/");
 				}
 			}
-			// Draw
+			// indices 2D array built.
+			// Sanity check
+			assert(indices[0][0] < numVertices);
+			assert(indices[1][0] < numVertices);
+			assert(indices[2][0] < numVertices);
+			if(numIndices == 4){
+				assert(indices[3][0] < numVertices);
+			}
+			// Add new element
+			if(numElements >= elementArraySize){
+				elements = realloc(elements, 2*elementArraySize*sizeof(element_t));
+				elementArraySize *= 2;
+			}
+			numElements++;
+			int ind = numElements - 1;
+			elements[ind].type = 'f';
+			elements[ind].numVertices = numIndices;
+			elements[ind].vertexIndices[0] = indices[0][0];
+			elements[ind].vertexIndices[1] = indices[1][0];
+			elements[ind].vertexIndices[2] = indices[2][0];
+			elements[ind].textureVertexIndices[0] = indices[0][1];
+			elements[ind].textureVertexIndices[1] = indices[1][1];
+			elements[ind].textureVertexIndices[2] = indices[2][1];
+			elements[ind].vertexNormalIndices[0] = indices[0][2];
+			elements[ind].vertexNormalIndices[1] = indices[1][2];
+			elements[ind].vertexNormalIndices[2] = indices[2][3];
+
+
+
+			// OLD below
 			if(numIndices == 3){
 				assert(indices[0][0] < numVertices);
 				assert(indices[1][0] < numVertices);
