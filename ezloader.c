@@ -14,26 +14,17 @@
 	What if not using texture vertices?
 	*/
 
-/* The plan:
-	This loader will only handle points, lines, and faces, and ignore the rest.
-
-	Create a group_t struct, with name, material name, number of vertices, vertex array, texture vertex array, normal array, and number of elements, and element_t array.
-
-	Create element_t struct, with type, and vertex index array.
-
-	To parse:
-	Tokenize line.
-	If begins with g, start new group.
-	If begins with v, add vertex.
-	If begins with vt, ignore (for now).
-	If begins with vn, add normal.
-	If begins with p/l/f, add element.
-
-	To load:
-	glBegin();
-	For each element, set normal and send it.
-	glEnd();
-*/
+// Globals
+	GLfloat * vertices;
+	GLfloat * textureVertices;
+	GLfloat * vertexNormals;
+	GLfloat * assocNormals; // numVertices quartets of trios of GLfloats
+	int arraySize, numVertices;
+	char groupName[MAX_TOKEN_SIZE + 1];
+	char mtllibName[MAX_TOKEN_SIZE + 1];
+	char matName[MAX_TOKEN_SIZE + 1];
+	int arraysAreDirty;
+	int vertexIndex, textureVertexIndex, vertexNormalIndex;
 
 // Possibly rename? too similar to gl function
 void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat * vertexNormals){
@@ -49,18 +40,15 @@ int ezload(FILE * fp){
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
-	char groupName[MAX_TOKEN_SIZE + 1];
-	char mtllibName[MAX_TOKEN_SIZE + 1];
-	char matName[MAX_TOKEN_SIZE + 1];
-	int numVertices = 0;
-	int arraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats in the below
-	GLfloat * vertices = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
-	GLfloat * textureVertices = NULL;//malloc(INITIAL_ARRAY_SIZE*sizeof(GLfloat));
-	GLfloat * vertexNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
-	int arraysAreDirty = 1;	// That is, need to generateArrays
-	int vertexIndex = 0;
-	int textureVertexIndex = 0;
-	int vertexNormalIndex = 0;
+	numVertices = 0;
+	arraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats in the below
+	vertices = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
+	textureVertices = NULL;//malloc(INITIAL_ARRAY_SIZE*sizeof(GLfloat));
+	vertexNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
+	arraysAreDirty = 1;	// That is, need to generateArrays
+	vertexIndex = 0;
+	textureVertexIndex = 0;
+	vertexNormalIndex = 0;
 	while(!feof(fp)){
 		// Tokenize
 		char * line = NULL;
@@ -179,7 +167,6 @@ int ezload(FILE * fp){
 				assert(indices[0][0] < numVertices);
 				assert(indices[1][0] < numVertices);
 				assert(indices[2][0] < numVertices);
-				printf("Drawing norms %f..., %f..., %f...\n", vertices[indices[0][0]*3], vertices[indices[1][0]*3], vertices[indices[2][0]*3]);
 				glBegin(GL_TRIANGLES);
 					glArrayElement(indices[0][0]);
 					glArrayElement(indices[1][0]);
