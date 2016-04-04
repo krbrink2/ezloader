@@ -60,8 +60,6 @@ void crossProduct(GLfloat u[], GLfloat v[], GLfloat product[]){
 	product[0] = p[0];
 	product[1] = p[1];
 	product[2] = p[2];
-	printf("u: %f %f %f\n", u[0], u[1], u[2]);
-	printf("v: %f %f %f\n", v[0], v[1], v[2]);
 }
 
 /* Returns 0 on success.
@@ -248,8 +246,29 @@ int ezload(FILE * fp){
 			v[1] = vertices[3*indices[2][0] + 1] 	- vertices[3*indices[1][0] + 1];
 			v[2] = vertices[3*indices[2][0] + 2] 	- vertices[3*indices[1][0] + 2];
 			crossProduct(v, u, surfaceNormal);
-			printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
-			exit(1);
+			//printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
+			// For each index, add surfaceNormal to next non-zero assocNormal
+			for(i = 0; i < numIndices; i++){
+				int thisIndex = indices[i][0];
+				// Find first non-zero assocNormal
+				int assocNormalIndex = 12*thisIndex;
+				int j;
+				for(j = 0; j < 4; j++){
+					if(assocNormals[assocNormalIndex + 3*j] == 0
+							&& assocNormals[assocNormalIndex + 3*j + 1] == 0
+							&& assocNormals[assocNormalIndex + 3*j + 2] == 0){
+						assocNormals[assocNormalIndex + 3*j] 		= surfaceNormal[0];
+						assocNormals[assocNormalIndex + 3*j + 1] 	= surfaceNormal[1];
+						assocNormals[assocNormalIndex + 3*j + 1]	= surfaceNormal[2];
+						break;
+					}
+					else if(j == 3){
+						printf("No free assocNormals found for vertex %i!\n", thisIndex);
+						exit(1);
+					}
+				}
+				printf("Added SurfNorm for vertex %i\n", thisIndex);
+			}
 
 			// OLD below
 			if(numIndices == 3){
