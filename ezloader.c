@@ -51,6 +51,17 @@ void flushFaces(){
 	;
 }
 
+// Takes the crossproduct of u and v, and stores it in product.
+void crossProduct(GLfloat u[], GLfloat v[], GLfloat product[]){
+	GLfloat p[3];
+	p[0] = u[1]*v[2] - u[2]*v[1];
+	p[1] = u[2]*v[0] - u[0]*v[2];
+	p[2] = u[0]*v[1] - u[1]*v[0];
+	product[0] = p[0];
+	product[1] = p[1];
+	product[2] = p[2];
+}
+
 /* Returns 0 on success.
 */
 int ezload(FILE * fp){
@@ -72,7 +83,8 @@ int ezload(FILE * fp){
 	textureVertices = NULL;//malloc(INITIAL_ARRAY_SIZE*sizeof(GLfloat));
 	vertexNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
 	elements = malloc(INITIAL_ARRAY_SIZE * sizeof(element_t));
-	
+	assocNormals = malloc(INITIAL_ARRAY_SIZE * 12 * sizeof(GLfloat));
+
 	// For each line in .obj...
 	while(!feof(fp)){
 		// Tokenize line
@@ -122,6 +134,7 @@ int ezload(FILE * fp){
 				vertices = realloc(vertices, 2*arraySize*sizeof(GLfloat));
 				// textureVertices...
 				vertexNormals = realloc(vertexNormals, 2*arraySize*sizeof(GLfloat));
+				assocNormals = realloc(assocNormals, 2*arraySize*12*sizeof(GLfloat));
 				arraySize *= 2;
 			}
 			// Add trio to vertexArray
@@ -129,7 +142,7 @@ int ezload(FILE * fp){
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
 			// Nullify assocNormals
-			int assocNormalsIndex = (numVertices - 1)*3;
+			int assocNormalsIndex = (numVertices - 1)*12;
 			int offset;
 			for (offset = 0; offset < 12; offset++){
 				assocNormals[assocNormalsIndex + offset] = 0;
@@ -160,10 +173,7 @@ int ezload(FILE * fp){
 		}
 		else if(!strcmp(tokens[0], "f")){
 			//printf("New face\n");
-			if(arraysAreDirty){
-				generateVertexArrays(vertices, textureVertices, vertexNormals);
-				arraysAreDirty = 0;
-			}
+			// Parse out indices
 			int numIndices;
 			if(tokens[4][0]){
 				numIndices = 4;
@@ -199,6 +209,13 @@ int ezload(FILE * fp){
 			if(numIndices == 4){
 				assert(indices[3][0] < numVertices);
 			}
+
+			// Renew GL vertex arrays if needed
+			if(arraysAreDirty){
+				generateVertexArrays(vertices, textureVertices, vertexNormals);
+				arraysAreDirty = 0;
+			}
+
 			// Add new element
 			if(numElements >= elementArraySize){
 				elements = realloc(elements, 2*elementArraySize*sizeof(element_t));
@@ -218,6 +235,8 @@ int ezload(FILE * fp){
 			elements[ind].vertexNormalIndices[1] = indices[1][2];
 			elements[ind].vertexNormalIndices[2] = indices[2][3];
 
+			// Get surface normal
+			GLfloat surfaceNormal[3];
 
 
 			// OLD below
