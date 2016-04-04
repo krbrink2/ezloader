@@ -12,6 +12,7 @@
 		For now, process-and-discard. Get simple version running.
 	Later, use texturing.
 	What if not using texture vertices?
+	Can vertices be shared between groups? Hows that affect normals?
 	*/
 
 // Globals
@@ -57,26 +58,31 @@ int ezload(FILE * fp){
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
+
+	// Set initial bookkeeping values
 	numVertices = 0;
-	arraySize = elementArraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats in the below
+	arraySize = elementArraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats/element_t's
+	arraysAreDirty = 1;			// That is, need to generateArrays
+	vertexIndex = 0;			// Index of items that has NOT been created
+	textureVertexIndex = 0;
+	vertexNormalIndex = 0;
+	numElements = 0;
+	// Allocate arrays
 	vertices = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
 	textureVertices = NULL;//malloc(INITIAL_ARRAY_SIZE*sizeof(GLfloat));
 	vertexNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
 	elements = malloc(INITIAL_ARRAY_SIZE * sizeof(element_t));
-	arraysAreDirty = 1;	// That is, need to generateArrays
-	vertexIndex = 0;
-	textureVertexIndex = 0;
-	vertexNormalIndex = 0;
-	numElements = 0;
+	
+	// For each line in .obj...
 	while(!feof(fp)){
-		// Tokenize
+		// Tokenize line
+		char tokens[32][MAX_TOKEN_SIZE + 1]; // max 32 tokens of MAX_TOKEN_SIZE chars
+		int i;
 		char * line = NULL;
 		size_t linelength = 0;
 		getline(&line, &linelength, fp);// Allocates
-		char tokens[32][MAX_TOKEN_SIZE + 1]; // max 16 tokens of MAX_TOKEN_SIZE chars
-		int i;
+		// Nullify each token
 		for(i = 0; i < 16; i++){
-			// Nullify each token
 			tokens[i][0] = '\0';
 		}
 		i = 0;
@@ -84,11 +90,12 @@ int ezload(FILE * fp){
 		char str[MAX_TOKEN_SIZE + 1];
 		temp = strtok(line, " ");
 		while(temp != NULL){
-			// copy token into tokens array
+			// Check if token is too large
 			if(strlen(temp) > MAX_TOKEN_SIZE){
 				printf("Token too large!\n");
 				exit(1);
 			}
+			// copy token into tokens array
 			strcpy(tokens[i++], temp);				
 			temp = strtok(NULL, " ");
 		}
@@ -113,18 +120,21 @@ int ezload(FILE * fp){
 			// Realloc if needed
 			if(numVertices*3 > arraySize){
 				vertices = realloc(vertices, 2*arraySize*sizeof(GLfloat));
-				//groupPtr->textureVertices = realloc(groupPtr->textureVertices, 2*groupPtr->arraySize*sizeof(GLfloat));
+				// textureVertices...
 				vertexNormals = realloc(vertexNormals, 2*arraySize*sizeof(GLfloat));
 				arraySize *= 2;
 			}
+			// Add trio to vertexArray
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
+			// Nullify assocNormals
+			int assocNormalsIndex = (numVertices - 1)*3;
+			int offset;
+			for (offset = 0; offset < 12; offset++){
+				assocNormals[assocNormalsIndex + offset] = 0;
+			}
 			arraysAreDirty = 1;
-			// Hack: set norms
-			//vertexNormals[vertexNormalIndex++] = 1;
-			//vertexNormals[vertexNormalIndex++] = 1;
-			//vertexNormals[vertexNormalIndex++] = 1;
 		}
 		else if(!strcmp(tokens[0], "vt")){
 			//printf("New texture vertex\n");
