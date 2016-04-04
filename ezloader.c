@@ -60,6 +60,8 @@ void crossProduct(GLfloat u[], GLfloat v[], GLfloat product[]){
 	product[0] = p[0];
 	product[1] = p[1];
 	product[2] = p[2];
+	printf("u: %f %f %f\n", u[0], u[1], u[2]);
+	printf("v: %f %f %f\n", v[0], v[1], v[2]);
 }
 
 /* Returns 0 on success.
@@ -237,7 +239,17 @@ int ezload(FILE * fp){
 
 			// Get surface normal
 			GLfloat surfaceNormal[3];
-
+			// Find u and v
+			GLfloat u[3], v[3];
+			u[0] = vertices[3*indices[1][0]]		- vertices[3*indices[0][0]];
+			u[1] = vertices[3*indices[1][0] + 1] 	- vertices[3*indices[0][0] + 1];
+			u[2] = vertices[3*indices[1][0] + 2] 	- vertices[3*indices[0][0] + 2];
+			v[0] = vertices[3*indices[2][0]] 		- vertices[3*indices[1][0]];
+			v[1] = vertices[3*indices[2][0] + 1] 	- vertices[3*indices[1][0] + 1];
+			v[2] = vertices[3*indices[2][0] + 2] 	- vertices[3*indices[1][0] + 2];
+			crossProduct(v, u, surfaceNormal);
+			printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
+			exit(1);
 
 			// OLD below
 			if(numIndices == 3){
