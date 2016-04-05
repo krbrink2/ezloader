@@ -22,7 +22,7 @@ void init(){
 
 	//char fname[] = "toyplane.obj";
 	//char fname[] = "Avent.obj";
-	char fname[] = "teapot_0.obj";
+	char fname[] = "ducky.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);

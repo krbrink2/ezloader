@@ -77,10 +77,6 @@ void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat
 		//printf("%f\n", assocNormals[i*3]);
 		normalize(&(assocNormals[i*3]));
 	}
-	for(i = 0; i < numVertices*3; i++){
-		if(vertices[i] != 0)
-			printf("Hooplah! %i %f\n", i, vertices[i]);
-	}
 	glNormalPointer(GL_FLOAT, 0, assocNormals);//vertexNormals);
 	//glTexCoordPointer();
 }
