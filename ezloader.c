@@ -4,6 +4,7 @@
 #include <GL/gl.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 #define INITIAL_ARRAY_SIZE (512)
 
 /* Considerations:
@@ -28,13 +29,6 @@
 	char matName[MAX_TOKEN_SIZE + 1];
 	int arraysAreDirty;
 	int vertexIndex, textureVertexIndex, vertexNormalIndex;
-
-// Possibly rename? too similar to gl function
-void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat * vertexNormals){
-	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glNormalPointer(GL_FLOAT, 0, assocNormals);//vertexNormals);
-	//glTexCoordPointer();
-}
 
 // Draws all faces in 
 void flushFaces(){
@@ -62,6 +56,35 @@ void crossProduct(GLfloat u[], GLfloat v[], GLfloat product[]){
 	product[2] = p[2];
 }
 
+// Given a vector, normalizes it
+void normalize(GLfloat v[]){
+	GLfloat twonorm = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+	if(twonorm == 0){
+		return;
+	}
+	v[0] /= twonorm;
+	v[1] /= twonorm;
+	v[2] /= twonorm;
+	printf("twonorm: %f\n", twonorm);
+	printf("New vector: %f %f %f\n", v[0], v[1], v[2]);
+}
+
+// Possibly rename? too similar to gl function
+void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat * vertexNormals){
+	glVertexPointer(3, GL_FLOAT, 0, vertices);
+	int i;
+	for(i = 0; i < numVertices; i++){
+		//printf("%f\n", assocNormals[i*3]);
+		normalize(&(assocNormals[i*3]));
+	}
+	for(i = 0; i < numVertices*3; i++){
+		if(vertices[i] != 0)
+			printf("Hooplah! %i %f\n", i, vertices[i]);
+	}
+	glNormalPointer(GL_FLOAT, 0, assocNormals);//vertexNormals);
+	//glTexCoordPointer();
+}
+
 /* Returns 0 on success.
 */
 int ezload(FILE * fp){
@@ -83,7 +106,7 @@ int ezload(FILE * fp){
 	textureVertices = NULL;//malloc(INITIAL_ARRAY_SIZE*sizeof(GLfloat));
 	vertexNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
 	elements = malloc(INITIAL_ARRAY_SIZE * sizeof(element_t));
-	assocNormals = malloc(INITIAL_ARRAY_SIZE * 12 * sizeof(GLfloat));
+	assocNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
 
 	// For each line in .obj...
 	while(!feof(fp)){
@@ -134,19 +157,16 @@ int ezload(FILE * fp){
 				vertices = realloc(vertices, 2*arraySize*sizeof(GLfloat));
 				// textureVertices...
 				vertexNormals = realloc(vertexNormals, 2*arraySize*sizeof(GLfloat));
-				assocNormals = realloc(assocNormals, 2*arraySize*12*sizeof(GLfloat));
+				assocNormals = realloc(assocNormals, 2*arraySize*sizeof(GLfloat));
 				arraySize *= 2;
 			}
 			// Add trio to vertexArray
+			assocNormals[vertexIndex] = 0;
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
+			assocNormals[vertexIndex] = 0;
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
+			assocNormals[vertexIndex] = 0;
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
-			// Nullify assocNormals
-			int assocNormalsIndex = (numVertices - 1)*12;
-			int offset;
-			for (offset = 0; offset < 12; offset++){
-				assocNormals[assocNormalsIndex + offset] = 0;
-			}
 			arraysAreDirty = 1;
 		}
 		else if(!strcmp(tokens[0], "vt")){
@@ -250,10 +270,10 @@ int ezload(FILE * fp){
 			// For each index, add surfaceNormal to its assocNormal
 			for(i = 0; i < numIndices; i++){
 				int thisIndex = indices[i][0];
-				assocNormals[thisIndex*3]		+= surfaceNormal[0];
-				assocNormals[thisIndex*3 + 1] 	+= surfaceNormal[1];
-				assocNormals[thisIndex*3 + 1] 	+= surfaceNormal[2];
-				printf("Added SurfNorm for vertex %i\n", thisIndex);
+				assocNormals[thisIndex*3]		-= surfaceNormal[0];
+				assocNormals[thisIndex*3 + 1] 	-= surfaceNormal[1];
+				assocNormals[thisIndex*3 + 1] 	-= surfaceNormal[2];
+				//printf("Added SurfNorm for vertex %i\n", thisIndex);
 			}
 
 			// OLD below
