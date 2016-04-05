@@ -32,7 +32,7 @@
 // Possibly rename? too similar to gl function
 void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat * vertexNormals){
 	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	glNormalPointer(GL_FLOAT, 0, vertexNormals);
+	glNormalPointer(GL_FLOAT, 0, assocNormals);//vertexNormals);
 	//glTexCoordPointer();
 }
 
@@ -247,26 +247,12 @@ int ezload(FILE * fp){
 			v[2] = vertices[3*indices[2][0] + 2] 	- vertices[3*indices[1][0] + 2];
 			crossProduct(v, u, surfaceNormal);
 			//printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
-			// For each index, add surfaceNormal to next non-zero assocNormal
+			// For each index, add surfaceNormal to its assocNormal
 			for(i = 0; i < numIndices; i++){
 				int thisIndex = indices[i][0];
-				// Find first non-zero assocNormal
-				int assocNormalIndex = 12*thisIndex;
-				int j;
-				for(j = 0; j < 4; j++){
-					if(assocNormals[assocNormalIndex + 3*j] == 0
-							&& assocNormals[assocNormalIndex + 3*j + 1] == 0
-							&& assocNormals[assocNormalIndex + 3*j + 2] == 0){
-						assocNormals[assocNormalIndex + 3*j] 		= surfaceNormal[0];
-						assocNormals[assocNormalIndex + 3*j + 1] 	= surfaceNormal[1];
-						assocNormals[assocNormalIndex + 3*j + 1]	= surfaceNormal[2];
-						break;
-					}
-					else if(j == 3){
-						printf("No free assocNormals found for vertex %i!\n", thisIndex);
-						exit(1);
-					}
-				}
+				assocNormals[thisIndex*3]		+= surfaceNormal[0];
+				assocNormals[thisIndex*3 + 1] 	+= surfaceNormal[1];
+				assocNormals[thisIndex*3 + 1] 	+= surfaceNormal[2];
 				printf("Added SurfNorm for vertex %i\n", thisIndex);
 			}
 
