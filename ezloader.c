@@ -30,21 +30,6 @@
 	int arraysAreDirty;
 	int vertexIndex, textureVertexIndex, vertexNormalIndex;
 
-// Draws all faces in 
-void flushFaces(){
-	//@TODO
-	/* Plan:
-	Each vertex has a set of assocNormals.
-	Every time a vertex is made, sets its assocNormals to zero vectors.
-	Upon flushFaces():
-	For each outstanding face, find face normal. For each vertex on this face, add this normal to the next non-zero assocNormal.
-	For each vertex, sum & normalize its assocNorms, put into vertexNormals.
-	Then generateVertexArrays(...).
-	Then, for each face, draw it.
-	*/
-	;
-}
-
 // Takes the crossproduct of u and v, and stores it in product.
 void crossProduct(GLfloat u[], GLfloat v[], GLfloat product[]){
 	GLfloat p[3];
@@ -70,7 +55,7 @@ void normalize(GLfloat v[]){
 }
 
 // Possibly rename? too similar to gl function
-void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat * vertexNormals){
+void generateVertexArrays(){
 	glVertexPointer(3, GL_FLOAT, 0, vertices);
 	int i;
 	for(i = 0; i < numVertices; i++){
@@ -79,6 +64,56 @@ void generateVertexArrays(GLfloat * vertices, GLfloat * textureVertices, GLfloat
 	}
 	glNormalPointer(GL_FLOAT, 0, assocNormals);//vertexNormals);
 	//glTexCoordPointer();
+}
+
+// Draws all elements from the array
+void flushFaces(){
+	/* Plan:
+	Each vertex has a set of assocNormals.
+	Every time a vertex is made, sets its assocNormals to zero vectors.
+	Upon flushFaces():
+	For each outstanding face, find face normal. For each vertex on this face, add this normal to the next non-zero assocNormal.
+	For each vertex, sum & normalize its assocNorms, put into vertexNormals.
+	Then generateVertexArrays(...).
+	Then, for each face, draw it.
+	*/
+	generateVertexArrays();
+	int i;
+	for(i = 0; i < numElements; i++){
+		int numIndices = elements[i].numVertices;
+		if(numIndices == 3){
+			assert(elements[i].vertexIndices[0] < numVertices);
+			assert(elements[i].vertexIndices[1] < numVertices);
+			assert(elements[i].vertexIndices[2] < numVertices);
+			glBegin(GL_TRIANGLES);
+				glArrayElement(elements[i].vertexIndices[0]);
+				glArrayElement(elements[i].vertexIndices[1]);
+				glArrayElement(elements[i].vertexIndices[2]);
+			glEnd();
+			//printf("Drew triangle: %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0]);
+		}
+		else if(numIndices == 4){
+			assert(elements[i].vertexIndices[0] < numVertices);
+			assert(elements[i].vertexIndices[1] < numVertices);
+			assert(elements[i].vertexIndices[2] < numVertices);
+			assert(elements[i].vertexIndices[3] < numVertices);
+			glBegin(GL_QUADS);
+				glArrayElement(elements[i].vertexIndices[0]);
+				glArrayElement(elements[i].vertexIndices[1]);
+				glArrayElement(elements[i].vertexIndices[2]);
+				glArrayElement(elements[i].vertexIndices[3]);
+			glEnd();
+			//printf("Drew quad: %i, %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0]);
+		}
+		else{
+			printf("Unrecognized number of vertices!\n");
+			exit(1);
+		}
+	}
+	free(elements);
+	numElements = 0;
+	elementArraySize = INITIAL_ARRAY_SIZE;
+	elements = malloc(INITIAL_ARRAY_SIZE * sizeof(element_t));
 }
 
 /* Returns 0 on success.
@@ -141,6 +176,7 @@ int ezload(FILE * fp){
 		else if(!strcmp(tokens[0], "g")){
 			//printf("New group\n");
 			strcpy(groupName, tokens[1]);
+			flushFaces();
 		}
 		else if (!strcmp(tokens[0], "usemtl")){
 			strcpy(matName, tokens[1]);
@@ -228,7 +264,7 @@ int ezload(FILE * fp){
 
 			// Renew GL vertex arrays if needed
 			if(arraysAreDirty){
-				generateVertexArrays(vertices, textureVertices, vertexNormals);
+				generateVertexArrays();
 				arraysAreDirty = 0;
 			}
 
@@ -271,38 +307,9 @@ int ezload(FILE * fp){
 				assocNormals[thisIndex*3 + 1] 	-= surfaceNormal[2];
 				//printf("Added SurfNorm for vertex %i\n", thisIndex);
 			}
-
-			// OLD below
-			if(numIndices == 3){
-				assert(indices[0][0] < numVertices);
-				assert(indices[1][0] < numVertices);
-				assert(indices[2][0] < numVertices);
-				glBegin(GL_TRIANGLES);
-					glArrayElement(indices[0][0]);
-					glArrayElement(indices[1][0]);
-					glArrayElement(indices[2][0]);
-				glEnd();
-				//printf("Drew triangle: %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0]);
-			}
-			else if(numIndices == 4){
-				assert(indices[0][0] < numVertices);
-				assert(indices[1][0] < numVertices);
-				assert(indices[2][0] < numVertices);
-				assert(indices[3][0] < numVertices);
-				glBegin(GL_QUADS);
-					glArrayElement(indices[0][0]);
-					glArrayElement(indices[1][0]);
-					glArrayElement(indices[2][0]);
-					glArrayElement(indices[3][0]);
-				glEnd();
-				//printf("Drew quad: %i, %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0], vertices[3][0]);
-			}
-			else{
-				printf("Unrecognized number of vertices!\n");
-				exit(1);
-			}
 		}
 	}
+	flushFaces();
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	// texcoords, too
