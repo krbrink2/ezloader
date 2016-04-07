@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <stdio.h>
+#include <math.h>
 #include "ezloader.h"
 
 // Globals
@@ -50,7 +51,10 @@ void init(){
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	gluLookAt(3, 1, 0, 0, 0, 0, 0, 1, 0);
+	gluLookAt(6*cos(angle/20), 3-cos(angle/10), 2, 0, 0, 0, 0, 1, 0);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
 
 	GLfloat matamb[] = {.83, .36, .1, 1.0};
 	GLfloat matdiff[] = {.83, .36, .1, 1.0};
@@ -62,20 +66,20 @@ void display(){
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
 	GLfloat spec[] = {0,1,1};
-	GLfloat lpos[] = {3, 3, -3};
+	GLfloat lpos[] = {0, 3, 0};
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
 	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
 
-	glTranslatef(-1, -2, 0);
-	glRotatef(angle, 0, 1, 0);
+	glPushMatrix();
+	//glTranslatef(3, -1, 0);
+	//glRotatef(angle, 0, 1, 0);
 	//glScalef(.01, .01, .01);
 	glTranslatef(0, 0, 0);
 	glCallList(callListIndex);
+	glPopMatrix();
 
 
 	glutSwapBuffers();
