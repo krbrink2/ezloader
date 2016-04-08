@@ -47,6 +47,11 @@ void normalize(GLfloat v[]){
 	if(twonorm == 0){
 		return;
 	}
+	if(v[2] != 0){
+		printf("ASDFASDF\n");
+		exit(1);
+	}
+	printf("Old vector: %f %f %f\n", v[0], v[1], v[2]);
 	v[0] /= twonorm;
 	v[1] /= twonorm;
 	v[2] /= twonorm;
