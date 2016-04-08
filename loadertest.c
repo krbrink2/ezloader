@@ -52,7 +52,7 @@ void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	//gluLookAt(6*cos(angle/20), 3-cos(angle/10), 2, 0, 0, 0, 0, 1, 0);
-	gluLookAt(0, 5, 0, 0, 0, 0, 0, 1, 0);
+	gluLookAt(4*cos(angle/50), 1, 4*sin(angle/50), 0, 0, 0, 0, 1, 0);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -67,7 +67,7 @@ void display(){
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
 	GLfloat spec[] = {0,1,1};
-	GLfloat lpos[] = {0, 0, 0};
+	GLfloat lpos[] = {4*cos(angle/10), 4*sin(angle/10), 0};
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
@@ -75,7 +75,7 @@ void display(){
 	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
 
 	glPushMatrix();
-	//glTranslatef(3, -1, 0);
+	glTranslatef(0, -2, 0);
 	//glRotatef(angle, 0, 1, 0);
 	//glScalef(.01, .01, .01);
 	glTranslatef(0, 0, 0);
