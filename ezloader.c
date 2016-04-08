@@ -47,10 +47,6 @@ void normalize(GLfloat v[]){
 	if(twonorm == 0){
 		return;
 	}
-	if(v[2] != 0){
-		printf("ASDFASDF\n");
-		exit(1);
-	}
 	printf("Old vector: %f %f %f\n", v[0], v[1], v[2]);
 	v[0] /= twonorm;
 	v[1] /= twonorm;
@@ -309,7 +305,7 @@ int ezload(FILE * fp){
 				int thisIndex = indices[i][0];
 				assocNormals[thisIndex*3]		-= surfaceNormal[0];
 				assocNormals[thisIndex*3 + 1] 	-= surfaceNormal[1];
-				assocNormals[thisIndex*3 + 1] 	-= surfaceNormal[2];
+				assocNormals[thisIndex*3 + 2] 	-= surfaceNormal[2];
 				//printf("Added SurfNorm for vertex %i\n", thisIndex);
 			}
 		}
