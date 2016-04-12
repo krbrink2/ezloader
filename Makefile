@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -lm -lGL -lGLU -lglut
+CFLAGS = -g -Wall -Werror -lm -lGL -lGLU -lglut
 TARGET = loadertest
 
 default: loadertest

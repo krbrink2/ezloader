@@ -20,15 +20,18 @@
 	GLfloat * vertices;
 	GLfloat * textureVertices;
 	GLfloat * vertexNormals;
-	GLfloat * assocNormals; // numVertices quartets of trios of GLfloats
 	element_t * elements;
+
 	int arraySize, numVertices;
 	int elementArraySize, numElements;
+	int vertexIndex, textureVertexIndex, vertexNormalIndex;
+		// Each above points to the next open spot
+		// Don't need elementIndex because have numElements.
+
 	char groupName[MAX_TOKEN_SIZE + 1];
 	char mtllibName[MAX_TOKEN_SIZE + 1];
 	char matName[MAX_TOKEN_SIZE + 1];
-	int arraysAreDirty;
-	int vertexIndex, textureVertexIndex, vertexNormalIndex;
+	int arraysAreDirty;					// Remove?
 
 // Takes the crossproduct of u and v, and stores it in product.
 void crossProduct(GLfloat u[], GLfloat v[], GLfloat product[]){
@@ -57,14 +60,26 @@ void normalize(GLfloat v[]){
 
 // Possibly rename? too similar to gl function
 void generateVertexArrays(){
+	// Vertex indices
+	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, vertices);
-	int i;
-	for(i = 0; i < numVertices; i++){
-		//printf("%f\n", assocNormals[i*3]);
-		normalize(&(assocNormals[i*3]));
+
+	// textures
+	if(textureVertexIndex > 0){
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, 0, textureVertices);
 	}
-	glNormalPointer(GL_FLOAT, 0, assocNormals);//vertexNormals);
-	//glTexCoordPointer();
+
+	// Normals
+	int i;
+	// Normalsize all vertexNormals
+	for(i = 0; i < numVertices; i++){
+		normalize(&(vertexNormals[i*3]));
+	}
+	if(vertexNormalIndex > 0){
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_FLOAT, 0, vertexNormals);
+	}
 }
 
 // Draws all elements from the array
@@ -80,12 +95,13 @@ void flushFaces(){
 	*/
 	generateVertexArrays();
 	int i;
+	// for each element...
 	for(i = 0; i < numElements; i++){
 		int numIndices = elements[i].numVertices;
+		assert(elements[i].vertexIndices[0] < numVertices);
+		assert(elements[i].vertexIndices[1] < numVertices);
+		assert(elements[i].vertexIndices[2] < numVertices);
 		if(numIndices == 3){
-			assert(elements[i].vertexIndices[0] < numVertices);
-			assert(elements[i].vertexIndices[1] < numVertices);
-			assert(elements[i].vertexIndices[2] < numVertices);
 			glBegin(GL_TRIANGLES);
 				glArrayElement(elements[i].vertexIndices[0]);
 				glArrayElement(elements[i].vertexIndices[1]);
@@ -94,9 +110,6 @@ void flushFaces(){
 			//printf("Drew triangle: %i, %i, %i\n", vertices[0][0], vertices[1][0], vertices[2][0]);
 		}
 		else if(numIndices == 4){
-			assert(elements[i].vertexIndices[0] < numVertices);
-			assert(elements[i].vertexIndices[1] < numVertices);
-			assert(elements[i].vertexIndices[2] < numVertices);
 			assert(elements[i].vertexIndices[3] < numVertices);
 			glBegin(GL_QUADS);
 				glArrayElement(elements[i].vertexIndices[0]);
@@ -121,24 +134,24 @@ void flushFaces(){
 */
 int ezload(FILE * fp){
 	// glPointSize(...)?
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	// glEnableClientState in generateVertexArrays
 
 	// Set initial bookkeeping values
 	numVertices = 0;
 	arraySize = elementArraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats/element_t's
 	arraysAreDirty = 1;			// That is, need to generateArrays
-	vertexIndex = 0;			// Index of items that has NOT been created
-	textureVertexIndex = 0;
-	vertexNormalIndex = 0;
-	numElements = 0;
+	vertexIndex = textureVertexIndex = vertexNormalIndex = numElements = 0;
+		// No items have been created
+
 	// Allocate arrays
-	vertices = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
-	textureVertices = NULL;//malloc(INITIAL_ARRAY_SIZE*sizeof(GLfloat));
-	vertexNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
-	elements = malloc(INITIAL_ARRAY_SIZE * sizeof(element_t));
-	assocNormals = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
+	vertices 		= malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
+	textureVertices = malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
+	vertexNormals 	= malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
+	elements 		= malloc(INITIAL_ARRAY_SIZE * sizeof(element_t));
+
+	// Mark textures and normals as uninitialized
+	textureVertices[0] 	= -1;
+	vertexNormals[0] 	= -1;
 
 	// For each line in .obj...
 	while(!feof(fp)){
@@ -154,7 +167,7 @@ int ezload(FILE * fp){
 		}
 		i = 0;
 		char * temp;
-		char str[MAX_TOKEN_SIZE + 1];
+		//char str[MAX_TOKEN_SIZE + 1];
 		temp = strtok(line, " ");
 		while(temp != NULL){
 			// Check if token is too large
@@ -168,14 +181,15 @@ int ezload(FILE * fp){
 		}
 		//printf("%s %s %s %s\n", tokens[0], tokens[1], tokens[2], tokens[3]);
 		free(line);
-		// String successfully tokenized
+		// Line successfully tokenized
 
-		// Populate arrays
+		// Choose operation
 		if(!strcmp(tokens[0], "mtllib")){
 			strcpy(mtllibName, tokens[1]);
 		}
 		else if(!strcmp(tokens[0], "g")){
 			//printf("New group\n");
+			//@TODO Concatenate words before strcpy'ing
 			strcpy(groupName, tokens[1]);
 			flushFaces();
 		}
@@ -185,31 +199,29 @@ int ezload(FILE * fp){
 		else if(!strcmp(tokens[0], "v")){
 			//printf("New vertex\n");
 			numVertices++;
-			// Realloc if needed
+			// Realloc if no room left
 			if(numVertices*3 > arraySize){
-				vertices = realloc(vertices, 2*arraySize*sizeof(GLfloat));
-				// textureVertices...
-				vertexNormals = realloc(vertexNormals, 2*arraySize*sizeof(GLfloat));
-				assocNormals = realloc(assocNormals, 2*arraySize*sizeof(GLfloat));
+				vertices 		= realloc(vertices, 		2*arraySize*sizeof(GLfloat));
+				textureVertices = realloc(textureVertices, 	2*arraySize*sizeof(GLfloat));
+				vertexNormals 	= realloc(vertexNormals, 	2*arraySize*sizeof(GLfloat));
 				arraySize *= 2;
 			}
-			// Add trio to vertexArray
-			assocNormals[vertexIndex] = 0;
+			// Add trio to vertexArray, and nullify this vertexNormal
+			vertexNormals[vertexIndex] = 0;
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
-			assocNormals[vertexIndex] = 0;
+			vertexNormals[vertexIndex] = 0;
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
-			assocNormals[vertexIndex] = 0;
+			vertexNormals[vertexIndex] = 0;
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
 			arraysAreDirty = 1;
 		}
 		else if(!strcmp(tokens[0], "vt")){
 			//printf("New texture vertex\n");
 			// Note: these are in pairs, not trios
-			//@TODO reconfigure reallocing to account for duos, not trios
-			//@TODO allow this to dynamicallly reallocate here. Not tied to vertices.
-			/*
-			groupPtr->textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
-			groupPtr->textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[2], NULL);*/
+			// We are assuming v's are always decalred before vt's.
+			textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
+			textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
+			arraysAreDirty = 1;
 		}
 		else if(!strcmp(tokens[0], "vn")){
 			//printf("New vertex normal\n");
@@ -228,29 +240,29 @@ int ezload(FILE * fp){
 			//printf("New face\n");
 			// Parse out indices
 			int numIndices;
-			if(tokens[4][0]){
+			if(tokens[4][0])
 				numIndices = 4;
-			}
-			else{
+			else
 				numIndices = 3;
-			}
-			// by index, then by vertex/texture/normal
 			GLint indices[4][3];
+				// by index, then by vertex/texture/normal
+			// Mark these textures and normals as uninitialized
+			indices[0][1] = indices[0][2] = -1;
 			//@TODO: can vertex/texture/normal even possibly be different with glarrays?
 			// Build indices 2D array.
 			// For tokens 1 thru numVertices...
 			for(i = 0; i < numIndices; i++){
 				// Split in three
 				// strtoi, then into GLint
-				int a = 0;
+				int vtn = 0;
 				temp = strtok(tokens[i + 1], "/");
+					// temp is the same as early in funciton, but currently not in use
 				while(NULL != temp){
-					// @NOTE: Not using texture vertices?
-					//	i.e. 15//20? Wat do?
-					if(temp[0] == '\0'){
-						// Not using texture vertices here
-					}
-					indices[i][a++] = (GLint)strtol(temp, NULL, 0) - 1;
+					if(temp[0] == '\0')
+						// Got two '/' next to each other: no texture
+						indices[i][vtn++] = -1;
+					else
+						indices[i][vtn++] = (GLint)strtol(temp, NULL, 0) - 1;
 					temp = strtok(NULL, "/");
 				}
 			}
@@ -259,11 +271,11 @@ int ezload(FILE * fp){
 			assert(indices[0][0] < numVertices);
 			assert(indices[1][0] < numVertices);
 			assert(indices[2][0] < numVertices);
-			if(numIndices == 4){
+			if(numIndices == 4)
 				assert(indices[3][0] < numVertices);
-			}
 
 			// Renew GL vertex arrays if needed
+			// Shouldn't this been in flushFaces?
 			if(arraysAreDirty){
 				generateVertexArrays();
 				arraysAreDirty = 0;
@@ -275,23 +287,28 @@ int ezload(FILE * fp){
 				elementArraySize *= 2;
 			}
 			numElements++;
-			int ind = numElements - 1;
-			elements[ind].type = 'f';
-			elements[ind].numVertices = numIndices;
-			elements[ind].vertexIndices[0] = indices[0][0];
-			elements[ind].vertexIndices[1] = indices[1][0];
-			elements[ind].vertexIndices[2] = indices[2][0];
-			elements[ind].textureVertexIndices[0] = indices[0][1];
-			elements[ind].textureVertexIndices[1] = indices[1][1];
-			elements[ind].textureVertexIndices[2] = indices[2][1];
-			elements[ind].vertexNormalIndices[0] = indices[0][2];
-			elements[ind].vertexNormalIndices[1] = indices[1][2];
-			elements[ind].vertexNormalIndices[2] = indices[2][3];
+			elements[numElements - 1].type 						= 'f';
+			elements[numElements - 1].numVertices 				= numIndices;
+			elements[numElements - 1].vertexIndices[0] 			= indices[0][0];
+			elements[numElements - 1].vertexIndices[1] 			= indices[1][0];
+			elements[numElements - 1].vertexIndices[2] 			= indices[2][0];
+			elements[numElements - 1].textureVertexIndices[0] 	= indices[0][1];
+			elements[numElements - 1].textureVertexIndices[1] 	= indices[1][1];
+			elements[numElements - 1].textureVertexIndices[2] 	= indices[2][1];
+			elements[numElements - 1].vertexNormalIndices[0] 	= indices[0][2];
+			elements[numElements - 1].vertexNormalIndices[1] 	= indices[1][2];
+			elements[numElements - 1].vertexNormalIndices[2] 	= indices[2][2];
+			if(4 == numIndices){
+				elements[numElements - 1].vertexIndices[3] 			= indices[3][0];
+				elements[numElements - 1].textureVertexIndices[2] 	= indices[3][1];
+				elements[numElements - 1].vertexNormalIndices[2] 	= indices[3][2];
+			}
 
 			// Get surface normal
 			GLfloat surfaceNormal[3];
 			// Find u and v
 			GLfloat u[3], v[3];
+			// u is first vertex to second, v is second to third
 			u[0] = vertices[3*indices[1][0]]		- vertices[3*indices[0][0]];
 			u[1] = vertices[3*indices[1][0] + 1] 	- vertices[3*indices[0][0] + 1];
 			u[2] = vertices[3*indices[1][0] + 2] 	- vertices[3*indices[0][0] + 2];
@@ -300,12 +317,13 @@ int ezload(FILE * fp){
 			v[2] = vertices[3*indices[2][0] + 2] 	- vertices[3*indices[1][0] + 2];
 			crossProduct(v, u, surfaceNormal);
 			//printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
-			// For each index, add surfaceNormal to its assocNormal
+			// For each index, add surfaceNormal to its vertexNormals
 			for(i = 0; i < numIndices; i++){
 				int thisIndex = indices[i][0];
-				assocNormals[thisIndex*3]		-= surfaceNormal[0];
-				assocNormals[thisIndex*3 + 1] 	-= surfaceNormal[1];
-				assocNormals[thisIndex*3 + 2] 	-= surfaceNormal[2];
+				//@TODO: figure out why this is minus, not plus
+				vertexNormals[thisIndex*3]		-= surfaceNormal[0];
+				vertexNormals[thisIndex*3 + 1] 	-= surfaceNormal[1];
+				vertexNormals[thisIndex*3 + 2] 	-= surfaceNormal[2];
 				//printf("Added SurfNorm for vertex %i\n", thisIndex);
 			}
 		}
@@ -313,14 +331,17 @@ int ezload(FILE * fp){
 	flushFaces();
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
-	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	return 0;
 }
 
 int ezloadCallList(GLint callListIndex, FILE *fp){
 	//glPointSize(2.0);
+	int retVal;
 	glNewList(callListIndex, GL_COMPILE);
 	{
-		ezload(fp);
+		retVal = ezload(fp);
 	}
 	glEndList();
+	return retVal;
 }

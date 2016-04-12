@@ -4,6 +4,7 @@
 #include <stdio.h>
 #define MAX_TOKEN_SIZE 128
 
+// I'm sure I could move these typedefs
 typedef struct element_t{
 	char type;
 	short numVertices;
@@ -12,6 +13,7 @@ typedef struct element_t{
 	int vertexNormalIndices[4];
 } element_t;
 
+// @TODO remove this
 typedef struct group_t{
 	char name[MAX_TOKEN_SIZE + 1];
 	char matName[MAX_TOKEN_SIZE + 1];

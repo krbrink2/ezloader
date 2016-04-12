@@ -10,6 +10,7 @@
 // Globals
 GLint callListIndex;
 GLfloat angle;
+GLint scaler = 1;
 
 void init(){
 	int maj, min;
@@ -18,21 +19,18 @@ void init(){
 	//printf("%i, %i\n", maj, min);
 
 	glEnable(GL_NORMALIZE);
-
+	glEnable(GL_AUTO_NORMAL);
 	glShadeModel(GL_SMOOTH);
 
-	char fname[] = "toyplane.obj";
+	//char fname[] = "toyplane.obj";
 	//char fname[] = "Avent.obj";
-	//char fname[] = "teapot_0.obj";
+	char fname[] = "teapot_0.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);
 
 	// load object to display
 	FILE *fp;
-	int read;
-	GLfloat x, y, z;
-	char ch;
 	callListIndex=glGenLists(1);
 	fp=fopen(fname,"r");
 	if (!fp) 
@@ -67,7 +65,8 @@ void display(){
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
 	GLfloat spec[] = {0,1,1};
-	GLfloat lpos[] = {4*cos(angle/10), 4*sin(angle/10), 0};
+	GLfloat lpos[] = {10, 10, 10};
+	//GLfloat lpos[] = {4*cos(angle/10), 4*sin(angle/10), 0};
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
@@ -75,9 +74,9 @@ void display(){
 	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
 
 	glPushMatrix();
-	glTranslatef(0, -2, 0);
+	glTranslatef(0, 0, 0);
 	//glRotatef(angle, 0, 1, 0);
-	//glScalef(.01, .01, .01);
+	glScalef(scaler, scaler, scaler);
 	glTranslatef(0, 0, 0);
 	glCallList(callListIndex);
 	glPopMatrix();
