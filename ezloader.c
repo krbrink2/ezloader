@@ -69,16 +69,14 @@ void generateVertexArrays(){
 		glTexCoordPointer(2, GL_FLOAT, 0, textureVertices);
 	}
 
-	// Normals
+	// Normals - even if auto generated
 	int i;
-	// Normalsize all vertexNormals
+	// Normalize all vertexNormals
 	for(i = 0; i < numVertices; i++){
 		normalize(&(vertexNormals[i*3]));
 	}
-	if(vertexNormalIndex > 0){
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, 0, vertexNormals);
-	}
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, vertexNormals);
 }
 
 // Draws all elements from the array
@@ -293,27 +291,30 @@ int ezload(FILE * fp){
 				elements[numElements - 1].vertexNormalIndices[2] 	= indices[3][2];
 			}
 
-			// Get surface normal
-			GLfloat surfaceNormal[3];
-			// Find u and v
-			GLfloat u[3], v[3];
-			// u is first vertex to second, v is second to third
-			u[0] = vertices[3*indices[1][0]]		- vertices[3*indices[0][0]];
-			u[1] = vertices[3*indices[1][0] + 1] 	- vertices[3*indices[0][0] + 1];
-			u[2] = vertices[3*indices[1][0] + 2] 	- vertices[3*indices[0][0] + 2];
-			v[0] = vertices[3*indices[2][0]] 		- vertices[3*indices[1][0]];
-			v[1] = vertices[3*indices[2][0] + 1] 	- vertices[3*indices[1][0] + 1];
-			v[2] = vertices[3*indices[2][0] + 2] 	- vertices[3*indices[1][0] + 2];
-			crossProduct(v, u, surfaceNormal);
-			//printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
-			// For each index, add surfaceNormal to its vertexNormals
-			for(i = 0; i < numIndices; i++){
-				int thisIndex = indices[i][0];
-				//@TODO: figure out why this is minus, not plus
-				vertexNormals[thisIndex*3]		-= surfaceNormal[0];
-				vertexNormals[thisIndex*3 + 1] 	-= surfaceNormal[1];
-				vertexNormals[thisIndex*3 + 2] 	-= surfaceNormal[2];
-				//printf("Added SurfNorm for vertex %i\n", thisIndex);
+			// If was not given normal, then autogenerate.
+			if(-1 == indices[0][2]){
+				// Get surface normal
+				GLfloat surfaceNormal[3];
+				// Find u and v
+				GLfloat u[3], v[3];
+				// u is first vertex to second, v is second to third
+				u[0] = vertices[3*indices[1][0]]		- vertices[3*indices[0][0]];
+				u[1] = vertices[3*indices[1][0] + 1] 	- vertices[3*indices[0][0] + 1];
+				u[2] = vertices[3*indices[1][0] + 2] 	- vertices[3*indices[0][0] + 2];
+				v[0] = vertices[3*indices[2][0]] 		- vertices[3*indices[1][0]];
+				v[1] = vertices[3*indices[2][0] + 1] 	- vertices[3*indices[1][0] + 1];
+				v[2] = vertices[3*indices[2][0] + 2] 	- vertices[3*indices[1][0] + 2];
+				crossProduct(v, u, surfaceNormal);
+				//printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
+				// For each index, add surfaceNormal to its vertexNormals
+				for(i = 0; i < numIndices; i++){
+					int thisIndex = indices[i][0];
+					//@TODO: figure out why this is minus, not plus
+					vertexNormals[thisIndex*3]		-= surfaceNormal[0];
+					vertexNormals[thisIndex*3 + 1] 	-= surfaceNormal[1];
+					vertexNormals[thisIndex*3 + 2] 	-= surfaceNormal[2];
+					//printf("Added SurfNorm for vertex %i\n", thisIndex);
+				}
 			}
 		}
 	}

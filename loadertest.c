@@ -10,7 +10,8 @@
 // Globals
 GLint callListIndex;
 GLfloat angle;
-GLint scaler = 1;
+GLfloat scaler = .02;
+GLfloat ytrans = -1;
 
 void init(){
 	int maj, min;
@@ -19,12 +20,12 @@ void init(){
 	//printf("%i, %i\n", maj, min);
 
 	glEnable(GL_NORMALIZE);
-	glEnable(GL_AUTO_NORMAL);
 	glShadeModel(GL_SMOOTH);
 
-	char fname[] = "toyplane.obj";
 	//char fname[] = "Avent.obj";
 	//char fname[] = "teapot_0.obj";
+	//char fname[] = "toyplane.obj";
+	char fname[] = "ducky.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -74,7 +75,7 @@ void display(){
 	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
 
 	glPushMatrix();
-	glTranslatef(0, 0, 0);
+	glTranslatef(0, ytrans, 0);
 	//glRotatef(angle, 0, 1, 0);
 	glScalef(scaler, scaler, scaler);
 	glTranslatef(0, 0, 0);
