@@ -21,9 +21,9 @@ void init(){
 
 	glShadeModel(GL_SMOOTH);
 
-	//char fname[] = "toyplane.obj";
+	char fname[] = "toyplane.obj";
 	//char fname[] = "Avent.obj";
-	char fname[] = "teapot_0.obj";
+	//char fname[] = "teapot_0.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);

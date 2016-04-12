@@ -47,12 +47,12 @@ void normalize(GLfloat v[]){
 	if(twonorm == 0){
 		return;
 	}
-	printf("Old vector: %f %f %f\n", v[0], v[1], v[2]);
+	//printf("Old vector: %f %f %f\n", v[0], v[1], v[2]);
 	v[0] /= twonorm;
 	v[1] /= twonorm;
 	v[2] /= twonorm;
-	printf("twonorm: %f\n", twonorm);
-	printf("New vector: %f %f %f\n", v[0], v[1], v[2]);
+	//printf("twonorm: %f\n", twonorm);
+	//printf("New vector: %f %f %f\n", v[0], v[1], v[2]);
 }
 
 // Possibly rename? too similar to gl function
@@ -123,7 +123,7 @@ int ezload(FILE * fp){
 	// glPointSize(...)?
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
-	//glEnableClientState(GL_TEXTURECOORD_ARRAY);
+	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	// Set initial bookkeeping values
 	numVertices = 0;
@@ -313,7 +313,7 @@ int ezload(FILE * fp){
 	flushFaces();
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
-	// texcoords, too
+	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 int ezloadCallList(GLint callListIndex, FILE *fp){
