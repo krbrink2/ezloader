@@ -31,7 +31,6 @@
 	char groupName[MAX_TOKEN_SIZE + 1];
 	char mtllibName[MAX_TOKEN_SIZE + 1];
 	char matName[MAX_TOKEN_SIZE + 1];
-	int arraysAreDirty;					// Remove?
 
 // Takes the crossproduct of u and v, and stores it in product.
 void crossProduct(GLfloat u[], GLfloat v[], GLfloat product[]){
@@ -139,7 +138,6 @@ int ezload(FILE * fp){
 	// Set initial bookkeeping values
 	numVertices = 0;
 	arraySize = elementArraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats/element_t's
-	arraysAreDirty = 1;			// That is, need to generateArrays
 	vertexIndex = textureVertexIndex = vertexNormalIndex = numElements = 0;
 		// No items have been created
 
@@ -213,7 +211,6 @@ int ezload(FILE * fp){
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			vertexNormals[vertexIndex] = 0;
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
-			arraysAreDirty = 1;
 		}
 		else if(!strcmp(tokens[0], "vt")){
 			//printf("New texture vertex\n");
@@ -221,14 +218,12 @@ int ezload(FILE * fp){
 			// We are assuming v's are always decalred before vt's.
 			textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
 			textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
-			arraysAreDirty = 1;
 		}
 		else if(!strcmp(tokens[0], "vn")){
 			//printf("New vertex normal\n");
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[1], NULL);
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[3], NULL);
-			arraysAreDirty  = 1;
 		}
 		else if(!strcmp(tokens[0], "p")){
 			printf("Skipping point\n");
@@ -274,12 +269,6 @@ int ezload(FILE * fp){
 			if(numIndices == 4)
 				assert(indices[3][0] < numVertices);
 
-			// Renew GL vertex arrays if needed
-			// Shouldn't this been in flushFaces?
-			if(arraysAreDirty){
-				generateVertexArrays();
-				arraysAreDirty = 0;
-			}
 
 			// Add new element
 			if(numElements >= elementArraySize){
