@@ -10,7 +10,7 @@
 // Globals
 GLint callListIndex;
 GLfloat angle;
-GLfloat scaler = .02;
+GLfloat scaler = .1;
 GLfloat ytrans = -1;
 
 void init(){
@@ -23,9 +23,11 @@ void init(){
 	glShadeModel(GL_SMOOTH);
 
 	//char fname[] = "Avent.obj";
+	//char fname[] = "pitcher.obj";
+	char fname[] = "wateringcan.obj";
 	//char fname[] = "teapot_0.obj";
 	//char fname[] = "toyplane.obj";
-	char fname[] = "ducky.obj";
+	//char fname[] = "ducky.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -51,7 +53,7 @@ void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	//gluLookAt(6*cos(angle/20), 3-cos(angle/10), 2, 0, 0, 0, 0, 1, 0);
-	gluLookAt(4*cos(angle/50), 1, 4*sin(angle/50), 0, 0, 0, 0, 1, 0);
+	gluLookAt(6, 1, 0, 0, 0, 0, 0, 1, 0);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -78,7 +80,7 @@ void display(){
 	glTranslatef(0, ytrans, 0);
 	//glRotatef(angle, 0, 1, 0);
 	glScalef(scaler, scaler, scaler);
-	glTranslatef(0, 0, 0);
+	glRotatef(angle, 0, 1, 0);
 	glCallList(callListIndex);
 	glPopMatrix();
 
@@ -95,7 +97,7 @@ void reshape(int w, int h){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	// field of view, aspect ratio, clipping near/far
-	gluPerspective(70, (float)w/h, 0.01, 10);
+	gluPerspective(60, (float)w/h, 0.01, 10);
 	glMatrixMode(GL_MODELVIEW);
 }
 

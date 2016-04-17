@@ -157,7 +157,7 @@ int ezload(FILE * fp){
 		char * line = NULL;
 		size_t linelength = 0;
 		getline(&line, &linelength, fp);// Allocates
-		// Nullify each token
+		// Initialize each token to NULL
 		for(i = 0; i < 16; i++){
 			tokens[i][0] = '\0';
 		}
@@ -233,12 +233,12 @@ int ezload(FILE * fp){
 			//printf("New face\n");
 			// Parse out indices
 			int numIndices;
-			if(tokens[4][0])
+			if('\n' != tokens[4][0]) // @TODO hackish, maybe reconfigure
 				numIndices = 4;
 			else
 				numIndices = 3;
 			GLint indices[4][3];
-				// by index, then by vertex/texture/normal
+				// By index, then by vertex/texture/normal
 			// Mark these textures and normals as uninitialized
 			indices[0][1] = indices[0][2] = -1;
 			//@TODO: can vertex/texture/normal even possibly be different with glarrays?
@@ -307,6 +307,8 @@ int ezload(FILE * fp){
 				crossProduct(v, u, surfaceNormal);
 				//printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
 				// For each index, add surfaceNormal to its vertexNormals
+				printf("--numIndices: %i\n", numIndices);
+				printf("Tokens[4][0]: '%c'\n", tokens[4][0]);
 				for(i = 0; i < numIndices; i++){
 					int thisIndex = indices[i][0];
 					//@TODO: figure out why this is minus, not plus
