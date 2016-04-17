@@ -5,13 +5,15 @@
 #include <GL/glut.h>
 #include <stdio.h>
 #include <math.h>
+#include <SOIL/SOIL.h>
 #include "ezloader.h"
 
 // Globals
 GLint callListIndex;
 GLfloat angle;
 GLfloat scaler = .2;
-GLfloat ytrans = -3;
+GLfloat ytrans = 0;
+static GLuint texNames[2];
 
 void init(){
 	int maj, min;
@@ -32,6 +34,15 @@ void init(){
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);
+
+	// Load texture
+	glGenTextures(2, texNames);
+	texNames[0] = SOIL_load_OGL_texture("metal.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	// load object to display
 	FILE *fp;
@@ -59,16 +70,19 @@ void display(){
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 
-	GLfloat matamb[] = {.83, .36, .1, 1.0};
-	GLfloat matdiff[] = {.83, .36, .1, 1.0};
+	//GLfloat matamb[] = {.83, .36, .1, 1.0};
+	//GLfloat matdiff[] = {.83, .36, .1, 1.0};
+	GLfloat matamb[] = {.9, .9, .9, 1.0};
+	GLfloat matdiff[] = {.4, .4, .4, 1.0};
 	GLfloat matspec[] = {1, 1, 1, 1.0};
+	//GLfloat matspec[] = {.01, .01, .01, 1.0};
 	glMaterialfv(GL_FRONT, GL_AMBIENT, matamb);
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, matdiff);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, matspec);
 	glMaterialf(GL_FRONT, GL_SHININESS, 50);
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
-	GLfloat spec[] = {0,1,1};
+	GLfloat spec[] = {1,1,1};
 	GLfloat lpos[] = {10, 10, 10};
 	//GLfloat lpos[] = {4*cos(angle/10), 4*sin(angle/10), 0};
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
@@ -76,6 +90,15 @@ void display(){
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
 	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
+
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, texNames[0]);
+	// The below will autogenerate texture coordinates
+	//glEnable(GL_TEXTURE_GEN_S);
+	//glEnable(GL_TEXTURE_GEN_T);
+	//glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+	//glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
 
 	glPushMatrix();
 	glTranslatef(0, ytrans, 0);
