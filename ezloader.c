@@ -164,7 +164,7 @@ int ezload(FILE * fp){
 		i = 0;
 		char * temp;
 		//char str[MAX_TOKEN_SIZE + 1];
-		temp = strtok(line, " ");
+		temp = strtok(line, " \n");
 		while(temp != NULL){
 			// Check if token is too large
 			if(strlen(temp) > MAX_TOKEN_SIZE){
@@ -173,7 +173,7 @@ int ezload(FILE * fp){
 			}
 			// copy token into tokens array
 			strcpy(tokens[i++], temp);				
-			temp = strtok(NULL, " ");
+			temp = strtok(NULL, " \n");
 		}
 		//printf("%s %s %s %s\n", tokens[0], tokens[1], tokens[2], tokens[3]);
 		free(line);
@@ -230,10 +230,11 @@ int ezload(FILE * fp){
 			printf("Skipping line\n");
 		}
 		else if(!strcmp(tokens[0], "f")){
-			//printf("New face\n");
 			// Parse out indices
 			int numIndices;
-			if('\n' != tokens[4][0]) // @TODO hackish, maybe reconfigure
+			//printf("--Tokens: \n[%s], \n[%s], \n[%s], \n[%s]\n", tokens[0], tokens[1], tokens[2], tokens[3]);
+				// Weird "\0" string behavior above
+			if('\0' != tokens[4][0])
 				numIndices = 4;
 			else
 				numIndices = 3;
