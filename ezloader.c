@@ -307,8 +307,8 @@ int ezload(FILE * fp){
 				crossProduct(v, u, surfaceNormal);
 				//printf("CP: %f, %f, %f\n", surfaceNormal[0], surfaceNormal[1], surfaceNormal[2]);
 				// For each index, add surfaceNormal to its vertexNormals
-				printf("--numIndices: %i\n", numIndices);
-				printf("Tokens[4][0]: '%c'\n", tokens[4][0]);
+				//printf("--numIndices: %i\n", numIndices);
+				//printf("Tokens[4][0]: '%c'\n", tokens[4][0]);
 				for(i = 0; i < numIndices; i++){
 					int thisIndex = indices[i][0];
 					//@TODO: figure out why this is minus, not plus

@@ -10,7 +10,7 @@
 // Globals
 GLint callListIndex;
 GLfloat angle;
-GLfloat scaler = .1;
+GLfloat scaler = 1;
 GLfloat ytrans = -1;
 
 void init(){
@@ -24,8 +24,8 @@ void init(){
 
 	//char fname[] = "Avent.obj";
 	//char fname[] = "pitcher.obj";
-	char fname[] = "wateringcan.obj";
-	//char fname[] = "teapot_0.obj";
+	//char fname[] = "wateringcan.obj";
+	char fname[] = "teapot_0.obj";
 	//char fname[] = "toyplane.obj";
 	//char fname[] = "ducky.obj";
 
