@@ -7,6 +7,7 @@
 #include <math.h>
 #define INITIAL_ARRAY_SIZE (512)
 
+
 /* Considerations:
 	Extend to two diminsions later?
 	Process-and-discard information, or store for user to alter?
@@ -23,6 +24,8 @@
 	element_t * elements;
 
 	int arraySize, numVertices;
+	//int textureVerticesArraySize, numTextureVertices;
+	//int vertexNormalsArraySize,
 	int elementArraySize, numElements;
 	int vertexIndex, textureVertexIndex, vertexNormalIndex;
 		// Each above points to the next open spot
@@ -55,6 +58,14 @@ void normalize(GLfloat v[]){
 	v[2] /= twonorm;
 	//printf("twonorm: %f\n", twonorm);
 	//printf("New vector: %f %f %f\n", v[0], v[1], v[2]);
+}
+
+// Reallocs vertices, textureVertices and vertexNormals to double size
+void lengthenArrays(){
+	vertices 		= realloc(vertices, 		2*arraySize*sizeof(GLfloat));
+	textureVertices = realloc(textureVertices, 	2*arraySize*sizeof(GLfloat));
+	vertexNormals 	= realloc(vertexNormals, 	2*arraySize*sizeof(GLfloat));
+	arraySize *= 2;
 }
 
 // Possibly rename? too similar to gl function
@@ -94,7 +105,7 @@ void flushFaces(){
 	int i;
 	// for each element...
 	for(i = 0; i < numElements; i++){
-		int numIndices = elements[i].numVertices;
+		int numIndices = elements[i].numPoints;
 		assert(elements[i].vertexIndices[0] < numVertices);
 		assert(elements[i].vertexIndices[1] < numVertices);
 		assert(elements[i].vertexIndices[2] < numVertices);
@@ -134,7 +145,7 @@ int ezload(FILE * fp){
 	// glEnableClientState in generateVertexArrays
 
 	// Set initial bookkeeping values
-	numVertices = 0;
+	//numVertices = 0;
 	arraySize = elementArraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats/element_t's
 	vertexIndex = textureVertexIndex = vertexNormalIndex = numElements = 0;
 		// No items have been created
@@ -172,7 +183,7 @@ int ezload(FILE * fp){
 				exit(1);
 			}
 			// copy token into tokens array
-			strcpy(tokens[i++], temp);				
+			strcpy(tokens[i++], temp);		// @ERROR
 			temp = strtok(NULL, " \n");
 		}
 		//printf("%s %s %s %s\n", tokens[0], tokens[1], tokens[2], tokens[3]);
@@ -196,11 +207,8 @@ int ezload(FILE * fp){
 			//printf("New vertex\n");
 			numVertices++;
 			// Realloc if no room left
-			if(numVertices*3 > arraySize){
-				vertices 		= realloc(vertices, 		2*arraySize*sizeof(GLfloat));
-				textureVertices = realloc(textureVertices, 	2*arraySize*sizeof(GLfloat));
-				vertexNormals 	= realloc(vertexNormals, 	2*arraySize*sizeof(GLfloat));
-				arraySize *= 2;
+			if(vertexIndex + 3 > arraySize){
+				lengthenArrays();
 			}
 			// Add trio to vertexArray, and nullify this vertexNormal
 			vertexNormals[vertexIndex] = 0;
@@ -211,14 +219,18 @@ int ezload(FILE * fp){
 			vertices[vertexIndex++] = (GLfloat)strtod(tokens[3], NULL);
 		}
 		else if(!strcmp(tokens[0], "vt")){
-			//printf("New texture vertex\n");
-			// Note: these are in pairs, not trios
-			// We are assuming v's are always decalred before vt's.
+			// Check if arrays are large enough
+			if(textureVertexIndex + 2 > arraySize){
+				lengthenArrays();
+			}
 			textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[1], NULL);
 			textureVertices[textureVertexIndex++] = (GLfloat)strtod(tokens[2], NULL);
 		}
 		else if(!strcmp(tokens[0], "vn")){
-			//printf("New vertex normal\n");
+			// Check if arrays are large enough
+			if(vertexNormalIndex + 3 > arraySize){
+				lengthenArrays();
+			}
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[1], NULL);
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[2], NULL);
 			vertexNormals[vertexNormalIndex++] = (GLfloat)strtod(tokens[3], NULL);
@@ -276,7 +288,7 @@ int ezload(FILE * fp){
 			}
 			numElements++;
 			elements[numElements - 1].type 						= 'f';
-			elements[numElements - 1].numVertices 				= numIndices;
+			elements[numElements - 1].numPoints 				= numIndices;
 			elements[numElements - 1].vertexIndices[0] 			= indices[0][0];
 			elements[numElements - 1].vertexIndices[1] 			= indices[1][0];
 			elements[numElements - 1].vertexIndices[2] 			= indices[2][0];

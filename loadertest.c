@@ -22,13 +22,13 @@ void init(){
 	glEnable(GL_NORMALIZE);
 	glShadeModel(GL_SMOOTH);
 
-	char fname[] = "Avent.obj";
+	//char fname[] = "Avent.obj";
 	//char fname[] = "pitcher.obj";
 	//char fname[] = "wateringcan.obj";
 	//char fname[] = "teapot_0.obj";
 	//char fname[] = "toyplane.obj";
 	//char fname[] = "ducky.obj";
-	//char fname[] = "pan_obj.obj";
+	char fname[] = "pan_obj.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);

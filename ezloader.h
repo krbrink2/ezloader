@@ -7,7 +7,7 @@
 // I'm sure I could move these typedefs
 typedef struct element_t{
 	char type;
-	short numVertices;
+	short numPoints;
 	int vertexIndices[4];
 	int textureVertexIndices[4];
 	int vertexNormalIndices[4];
