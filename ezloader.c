@@ -76,16 +76,22 @@ void generateVertexArrays(){
 
 	// textures
 	if(textureVertexIndex > 0){
+		glEnable(GL_TEXTURE_2D);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		glTexCoordPointer(2, GL_FLOAT, 0, textureVertices);
 	}
+	else{
+		// No texures
+		glDisable(GL_TEXTURE_2D);
+	}
 
 	// Normals - even if auto generated
-	int i;
+	//int i;
 	// Normalize all vertexNormals
-	for(i = 0; i < numVertices; i++){
-		normalize(&(vertexNormals[i*3]));
-	}
+		// I am assuming this is done automatically
+	//for(i = 0; i < numVertices; i++){
+		//normalize(&(vertexNormals[i*3]));
+	//}
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_FLOAT, 0, vertexNormals);
 }

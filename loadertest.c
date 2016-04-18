@@ -11,7 +11,7 @@
 // Globals
 GLint callListIndex;
 GLfloat angle;
-GLfloat scaler = .2;
+GLfloat scaler = .4;
 GLfloat ytrans = 0;
 static GLuint texNames[2];
 
@@ -27,10 +27,11 @@ void init(){
 	//char fname[] = "Avent.obj";
 	//char fname[] = "pitcher.obj";
 	//char fname[] = "wateringcan.obj";
-	//char fname[] = "teapot_0.obj";
+	char fname[] = "teapot_0.obj";
 	//char fname[] = "toyplane.obj";
 	//char fname[] = "ducky.obj";
-	char fname[] = "pan_obj.obj";
+	//char fname[] = "pan_obj.obj";
+	//char fname[] = "sword.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);
