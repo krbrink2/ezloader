@@ -5,8 +5,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
-#define INITIAL_ARRAY_SIZE (512)
-
+#define INITIAL_ARRAY_SIZE	(512)
 
 /* Considerations:
 	Extend to two diminsions later?
@@ -16,6 +15,15 @@
 	What if not using texture vertices?
 	Can vertices be shared between groups? Hows that affect normals?
 	*/
+
+// Typedefs
+typedef struct element_t{
+	char type;
+	short numPoints;
+	int vertexIndices[4];
+	int textureVertexIndices[4];
+	int vertexNormalIndices[4];
+} element_t;
 
 // Globals
 	GLfloat * vertices;
@@ -147,14 +155,10 @@ void flushFaces(){
 /* Returns 0 on success.
 */
 int ezload(FILE * fp){
-	// glPointSize(...)?
-	// glEnableClientState in generateVertexArrays
-
 	// Set initial bookkeeping values
-	//numVertices = 0;
+	numVertices = 0;
 	arraySize = elementArraySize = INITIAL_ARRAY_SIZE;	// number of GLfloats/element_t's
 	vertexIndex = textureVertexIndex = vertexNormalIndex = numElements = 0;
-		// No items have been created
 
 	// Allocate arrays
 	vertices 		= malloc(INITIAL_ARRAY_SIZE * sizeof(GLfloat));
@@ -166,7 +170,7 @@ int ezload(FILE * fp){
 	textureVertices[0] 	= -1;
 	vertexNormals[0] 	= -1;
 
-	// For each line in .obj...
+	// Process each line in fp one at a time.
 	while(!feof(fp)){
 		// Tokenize line
 		char tokens[32][MAX_TOKEN_SIZE + 1]; // max 32 tokens of MAX_TOKEN_SIZE chars

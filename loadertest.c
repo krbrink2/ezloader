@@ -11,8 +11,8 @@
 // Globals
 GLint callListIndex;
 GLfloat angle;
-GLfloat scaler = .4;
-GLfloat ytrans = 0;
+GLfloat scaler = .03;
+GLfloat ytrans = -1;
 static GLuint texNames[2];
 
 void init(){
@@ -26,19 +26,23 @@ void init(){
 
 	//char fname[] = "Avent.obj";
 	//char fname[] = "pitcher.obj";
-	//char fname[] = "wateringcan.obj";
-	char fname[] = "teapot_0.obj";
+	char fname[] = "wateringcan.obj";
+	//char fname[] = "teapot_0.obj";
 	//char fname[] = "toyplane.obj";
 	//char fname[] = "ducky.obj";
 	//char fname[] = "pan_obj.obj";
+	//char fname[] = "dlamp.obj";
+	//char fname[] = "dtable.obj";
+	//char fname[] = "teapot.obj";
 	//char fname[] = "sword.obj";
+	//char fname[] = "shitplane.obj";
 
 	glClearColor(.2, .2, .2, 0);
 	glEnable(GL_DEPTH_TEST);
 
 	// Load texture
 	glGenTextures(2, texNames);
-	texNames[0] = SOIL_load_OGL_texture("metal.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+	//texNames[0] = SOIL_load_OGL_texture("metal.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -65,8 +69,10 @@ void init(){
 void display(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
-	//gluLookAt(6*cos(angle/20), 3-cos(angle/10), 2, 0, 0, 0, 0, 1, 0);
-	gluLookAt(6, 1, 0, 0, 0, 0, 0, 1, 0);
+	//gluLookAt(3*cos(angle/20), -cos(angle/10), 2, 0, 0, -1, 0, 1, 0);
+	//gluLookAt(6, 1, 0, 0, 0, 0, 0, 1, 0);
+	//gluLookAt(1.4, 4, 0, 1.3, 1.5, 0, 0, 1, 0);
+	gluLookAt(0, 0, 1, 0, 0, 0, 0, 1, 0);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -84,7 +90,8 @@ void display(){
 	GLfloat amb[] = {0.2,0.2,0.2};
 	GLfloat diff[] = {1.0,1.0,1.0};
 	GLfloat spec[] = {1,1,1};
-	GLfloat lpos[] = {10, 10, 10};
+	GLfloat lpos[] = {10*sin(angle/30), 10*cos(angle/30), 10};
+	//GLfloat lpos[] = {0, 100, 0};
 	//GLfloat lpos[] = {4*cos(angle/10), 4*sin(angle/10), 0};
 	glLightfv(GL_LIGHT0, GL_POSITION, lpos);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, amb);
@@ -102,11 +109,14 @@ void display(){
 	//glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
 
 	glPushMatrix();
-	glTranslatef(0, ytrans, 0);
-	//glRotatef(angle, 0, 1, 0);
-	glScalef(scaler, scaler, scaler);
-	glRotatef(angle, 0, 1, 0);
-	glCallList(callListIndex);
+		glTranslatef(0, ytrans, 0);
+		//glRotatef(90, 1, 0, 0);
+		glRotatef(90, 0, -1, 0);
+
+		//glTranslatef(0, ytrans, 0);
+		glScalef(scaler, scaler, scaler);
+		//glRotatef(angle, 0, 1, 0);
+		glCallList(callListIndex);
 	glPopMatrix();
 
 
