@@ -158,15 +158,19 @@ int ezload(FILE * fp){
 	while(!feof(fp)){
 		// Tokenize line
 		char tokens[MAX_NUM_TOKENS][MAX_TOKEN_SIZE + 1];
-		int i;
-		char * line = NULL;
-		size_t linelength = 0;
-		getline(&line, &linelength, fp);// Allocates
+		int i, j;
+		char * line = calloc(1, MAX_TOKEN_SIZE + 1);
+		size_t lineLength = MAX_TOKEN_SIZE + 1;
+		//const char delim[] = " \n";
+
+		getline(&line, &lineLength, fp);// Allocates
 		// Initialize each token to NULL
 		for(i = 0; i < MAX_NUM_TOKENS; i++){
-			tokens[i][0] = '\0';
+			for(j = 0; j < MAX_TOKEN_SIZE + 1; j++){
+				tokens[i][j] = '\0';
+			}
 		}
-		char * temp = strtok(line, " \n");
+		char * temp = strtok(line, " \n");	//@ERROR: tons of uninitialization.
 		i = 0;
 		while(temp != NULL){
 			// Check if token is too large
@@ -253,6 +257,7 @@ int ezload(FILE * fp){
 				temp = strtok(tokens[i + 1], "/");
 				while(NULL != temp){
 					if(0 == strlen(temp))
+						//@TODO: This is NOT how strtok works. This will NOT properly read v//n.
 						// Got two '/' next to each other: no texture
 						points[i][vtn++] = -1;
 					else
