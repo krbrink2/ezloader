@@ -170,7 +170,7 @@ int ezload(FILE * fp){
 				tokens[i][j] = '\0';
 			}
 		}
-		char * temp = strtok(line, " \n");	//@ERROR: tons of uninitialization.
+		char * temp = strtok(line, " \n\r");	//@ERROR: tons of uninitialization.
 		i = 0;
 		while(temp != NULL){
 			// Check if token is too large
@@ -181,7 +181,7 @@ int ezload(FILE * fp){
 			}
 			// copy token into tokens array
 			strcpy(tokens[i++], temp);
-			temp = strtok(NULL, " \n");
+			temp = strtok(NULL, " \n\r");
 		}
 		free(line);
 		// Line has now been successfully tokenized.
@@ -241,10 +241,12 @@ int ezload(FILE * fp){
 		else if(!strcmp(tokens[0], "f")){
 			// Parse out points
 			int numPoints;	// 3 if triangle, 4 if quad, etc.
-			if('\0' != tokens[4][0])
+			if('\0' != tokens[4][0]){
 				numPoints = 4;
-			else
+			}
+			else{
 				numPoints = 3;
+			}
 			GLint points[4][3];
 				// By point, then by vertex/texture/normal
 			// Mark these textures and normals as uninitialized

@@ -11,8 +11,8 @@
 // Globals
 GLint callListIndex;
 GLfloat angle;
-GLfloat scaler = .03;
-GLfloat ytrans = -1;
+GLfloat scaler = .01;
+GLfloat ytrans = -0;
 static GLuint texNames[2];
 
 void init(){
@@ -26,14 +26,14 @@ void init(){
 
 	//char fname[] = "Avent.obj";
 	//char fname[] = "pitcher.obj";
-	char fname[] = "wateringcan.obj";
+	//char fname[] = "wateringcan.obj";
 	//char fname[] = "teapot_0.obj";
 	//char fname[] = "toyplane.obj";
 	//char fname[] = "ducky.obj";
 	//char fname[] = "pan_obj.obj";
 	//char fname[] = "dlamp.obj";
 	//char fname[] = "dtable.obj";
-	//char fname[] = "teapot.obj";
+	char fname[] = "teapot.obj";
 	//char fname[] = "sword.obj";
 	//char fname[] = "shitplane.obj";
 
